@@ -1,0 +1,78 @@
+/* Hallmark stamp — custom run, app screen, genre: playful */
+/* critique: no-castigo pixel-art PWA, pantalla de inicio */
+/* waive: imagery (pixel art, sin fotos) | landing-sections (app, no marketing) | theme-deal (custom) */
+
+@import './palette/variables.css';
+
+/* ── Reset mínimo ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  overflow-x: clip; /* Floor rule 4: clip, no hidden */
+  background-color: var(--color-menta);
+  color: var(--color-tinta);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-md);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Safe areas para notch y bordes redondeados */
+#app {
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Contenedor principal centrado y acotado */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Botones táctiles ── */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  /* Floor rule 6: focus-visible visible al instante */
+  outline-offset: 3px;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--color-bosque);
+  outline-offset: 3px;
+  border-radius: var(--border-radius-sm);
+}
+
+/* ── Canvas pixelado ── */
+canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+}
+
+/* ── Tipografía pixel ── */
+.pixel-text {
+  font-family: var(--font-pixel);
+  line-height: 1.6;
+}
+

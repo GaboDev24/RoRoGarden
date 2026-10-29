@@ -1,0 +1,63 @@
+/* variables.css — Tokens de paleta RoRoGarden */
+/* FUENTE DE VERDAD CSS — sincronizada con src/palette/colors.ts */
+/* LOCKED: No modificar sin actualizar también colors.ts */
+
+:root {
+  /* === Paleta cromática === */
+  --color-tinta:         #2B3A42; /* Contornos, texto principal */
+  --color-agua-profunda: #3E5C7A; /* Fondos oscuros, agua profunda */
+  --color-azul-niebla:   #A9C8E8; /* Niebla, cielo noche */
+  --color-celeste-agua:  #BFE6EE; /* Fondos claros, agua superficial */
+  --color-turquesa:      #8ED1CF; /* Agua animada, reflejos */
+  --color-menta:         #D9F2E6; /* Fondos muy claros */
+  --color-salvia:        #A8D5BA; /* Hojas, nenúfares */
+  --color-sapo:          #8CC9A1; /* Cuerpo del sapo */
+  --color-musgo:         #6FA98A; /* Sombras, musgo */
+  --color-bosque:        #3F6F5E; /* Contornos oscuros vegetación */
+  --color-crema:         #F6EFC9; /* Vientre, luna, brillos */
+  --color-acento:        #E8A987; /* Sombrero hongo — uso moderado */
+
+  /* === Tipografía === */
+  --font-pixel:   'Press Start 2P', monospace;
+  --font-ui:      system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-size-xs: 0.625rem;  /* 10px */
+  --font-size-sm: 0.75rem;   /* 12px */
+  --font-size-md: 1rem;      /* 16px base */
+  --font-size-lg: 1.25rem;
+
+  /* === Espaciado === */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  40px;
+
+  /* === Layout === */
+  --container-max:    480px;
+  --touch-target-min: 48px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+
+  /* === Transiciones (solo transform/opacity) === */
+  --transition-fast:   120ms ease-out;
+  --transition-normal: 240ms ease-out;
+  --transition-slow:   400ms ease-out;
+}
+
+/* Reducción de movimiento: deshabilitar animaciones */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast:   0ms;
+    --transition-normal: 0ms;
+    --transition-slow:   0ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
