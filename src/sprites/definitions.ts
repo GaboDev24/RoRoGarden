@@ -18,185 +18,185 @@ import type { SpriteDefinition } from './renderer'
  *   'C' = crema luna (#F6EFC9)
  *   'H' = acento cálido (#E8A987)
  *
+ * Estilo: formas redondas y regordetas, ojos grandes con aro crema,
+ * sonrisa diminuta y mejillas rosadas (H).
  * Todos los frames de un mismo sprite tienen el mismo ancho y alto.
- * Grillas 20x18 para el sapo, 16x16 para elementos más pequeños.
  */
 
 // ─────────────────────────────────────────────────────────────
-// SAPO SENTADO — animación idle de 2 cuadros (respiración)
+// SAPO SENTADO — idle de 2 cuadros (ojos abiertos / ojos cerrados)
 // Tamaño lógico: 20x18 px
 // ─────────────────────────────────────────────────────────────
 const FROG_IDLE_FRAME_1: string[] = [
-  '..TTTTTTTTTTTTTT....',
-  '.TSSSSSSSSSSSSST....',
-  'TSSSSSSSSSSSSSSST...',
-  'TSSGSSSSSSSSGSST....',
-  'TSSSSSSSSSSSSSSST...',
-  'TSCCCCCCCCCCCCSST...',
-  'TSCTTSSSSSTTCSST....',
-  'TSCTTCCCCCTTCSST....',
-  'TSCCCCCCCCCCCSST....',
-  'TSSSSSSSSSSSSGSST...',
-  'TSSSSSSSSSSSSSSST...',
-  'TSSGSSGSSSGSGSST....',
-  'TTSSSSSSSSSSSSTT....',
-  '.TSSSSSSSSSSST......',
-  '..TTTTTTTTTTTT......',
-  '...................',
-  '...................',
-  '...................',
+  '.......TTTTTT.......',
+  '.....TTSSSSSSTT.....',
+  '....TSSSSSSSSSST....',
+  '...TSSSSSSSSSSSST...',
+  '..TSTCCTSSSSTCCTST..',
+  '..TSCTTCSSSSCTTCST..',
+  '.TSSCTTCSSSSCTTCSST.',
+  '.TSSTCCTSSSSTCCTSST.',
+  '.TSSHHSSSSSSSSHHSST.',
+  '.TSSSSSSSTSSTSSSSST.',
+  '.TSSSSSSSTTSSSSSSST.',
+  '.TSSGSSMMMMMMSSGSST.',
+  '.TSSSMMMMMMMMMMSSST.',
+  '..TSSMMMMMMMMMMSST..',
+  '...TSSSSSSSSSSSST...',
+  '..TSSSTTTTTTTTSSST..',
+  '..TTTTT......TTTTT..',
+  '....................',
 ]
 
-// Frame 2: el cuerpo se expande 1px hacia abajo (efecto respiración)
+// Frame 2: ojos cerrados contentos (parpadeo)
 const FROG_IDLE_FRAME_2: string[] = [
-  '..TTTTTTTTTTTTTT....',
-  '.TSSSSSSSSSSSSST....',
-  'TSSSSSSSSSSSSSSST...',
-  'TSSGSSSSSSSSGSST....',
-  'TSSSSSSSSSSSSSSST...',
-  'TSCCCCCCCCCCCCSST...',
-  'TSCTTSSSSSTTCSST....',
-  'TSCTTCCCCCTTCSST....',
-  'TSCCCCCCCCCCCSST....',
-  'TSSSSSSSSSSSSGSST...',
-  'TSSSSSSSSSSSSSSST...',
-  'TSSGSSGSSSGSGSST....',
-  'TTSSSSSSSSSSSSSTT...',
-  '.TSSSSSSSSSSSST.....',
-  '..TTTTTTTTTTTTT.....',
-  '..TTTTTTTTTTTT......',
-  '...................',
-  '...................',
+  '.......TTTTTT.......',
+  '.....TTSSSSSSTT.....',
+  '....TSSSSSSSSSST....',
+  '...TSSSSSSSSSSSST...',
+  '..TSSSSSSSSSSSSSST..',
+  '..TSSTTSSSSSSTTSST..',
+  '.TSSTSSTSSSSTSSTSST.',
+  '.TSSSSSSSSSSSSSSSST.',
+  '.TSSHHSSSSSSSSHHSST.',
+  '.TSSSSSSSTSSTSSSSST.',
+  '.TSSSSSSSTTSSSSSSST.',
+  '.TSSGSSMMMMMMSSGSST.',
+  '.TSSSMMMMMMMMMMSSST.',
+  '..TSSMMMMMMMMMMSST..',
+  '...TSSSSSSSSSSSST...',
+  '..TSSSTTTTTTTTSSST..',
+  '..TTTTT......TTTTT..',
+  '....................',
 ]
 
 export const frogIdle: SpriteDefinition = {
   id: 'frog-idle',
   frames: [FROG_IDLE_FRAME_1, FROG_IDLE_FRAME_2],
-  frameMs: 700,
+  // Si tu renderer permite duración por frame: ~1800 ms abierto, ~150 ms cerrado
+  frameMs: 1200,
 }
 
 // ─────────────────────────────────────────────────────────────
-// SAPO DORMIDO — estático, acurrucado
-// Tamaño lógico: 20x14 px
+// SAPO DORMIDO — estático, bolita con ojos cerrados
+// Tamaño lógico: 20x12 px
 // ─────────────────────────────────────────────────────────────
 export const frogSleeping: SpriteDefinition = {
   id: 'frog-sleeping',
   frames: [[
-    '..TTTTTTTTTT........',
-    '.TSSSSSSSSSSST......',
-    'TSSSGSSSSGSSSST.....',
-    'TSSCCCCCCCCSST......',
-    'TSSTTCCCCTTSST......',
-    'TSSCCCCCCCCSST......',
-    'TSSSSSSSSSSSSST.....',
-    'TSSGSSGSGSGSST......',
-    'TTSSSSSSSSSTT.......',
-    '.TTSSSSSSSTT........',
-    '..TTTTTTTTT.........',
-    '...........T.T......',
-    '............T.......',
-    '...................',
+    '......TTTTTTTT......',
+    '....TTSSSSSSSSTT....',
+    '...TSSSSSSSSSSSST...',
+    '..TSSSSSSSSSSSSSST..',
+    '.TSSTTTSSSSSSTTTSST.',
+    '.TSHHSSSSSSSSSSHHST.',
+    '.TSSSSSSSTTSSSSSSST.',
+    '.TSSGSSSSSSSSSSGSST.',
+    '..TSSSSSSSSSSSSSST..',
+    '...TSSSSSSSSSSSST...',
+    '....TTSSSSSSSSTT....',
+    '......TTTTTTTT......',
   ]],
 }
 
 // ─────────────────────────────────────────────────────────────
-// HONGO CON SOMBRERO
+// HONGUITO — sombrero cálido, laminillas crema, tallo con carita
 // Tamaño lógico: 16x18 px
 // ─────────────────────────────────────────────────────────────
 export const mushroom: SpriteDefinition = {
   id: 'mushroom',
   frames: [[
-    '....THHHHHT.....',
-    '...THHHHHHHHT...',
-    '..THHHHHHHHHT...',
-    '.THHHHHHHHHHHT..',
-    '.THHHHHHHHHHHHT.',
-    'THHHHHHHHHHHHHT.',
-    'THHHHCCHHHCCHHT.',
-    'THHHHCCHHHCCHHT.',
-    '.TCCCCCCCCCCCT..',
-    '.TCCCCCCCCCCCT..',
-    '..TTCCCCCCCCTT..',
-    '...TCCCCCCCT....',
-    '...TCCTTTTCT....',
-    '...TCCTTTCT.....',
-    '..TCCTTTTCCT....',
-    '..TCCCCCCCCCT...',
-    '...TTTTTTTTT....',
-    '................',
+    '.....TTTTTT.....',
+    '...TTHHHHHHTT...',
+    '..THHHHHHHHHHT..',
+    '.THHHCHHHHHHHHT.',
+    'THHCHHHHHHHHHHHT',
+    'THHHHHHHHHHHHHHT',
+    'TTHHHHHHHHHHHHTT',
+    '.TTTTTTTTTTTTTT.',
+    '..TCCTCCCCTCCT..',
+    '...TTTTTTTTTT...',
+    '....TMMMMMMT....',
+    '...TMMMMMMMMT...',
+    '...TMTCMMTCMT...',
+    '...TMTTMMTTMT...',
+    '..TMHMMTTMMHMT..',
+    '..TMMMMMMMMMMT..',
+    '...TTMMMMMMTT...',
+    '.....TTTTTT.....',
   ]],
 }
 
 // ─────────────────────────────────────────────────────────────
-// NENÚFAR FLOTANTE
+// NENÚFAR FLOTANTE — hoja con muesca, vena y reflejo
 // Tamaño lógico: 20x12 px
 // ─────────────────────────────────────────────────────────────
 export const lilypad: SpriteDefinition = {
   id: 'lilypad',
   frames: [[
-    '.....TVVVVVVT.......',
-    '...TVVVVVVVVVVT.....',
-    '..TVVVGVVVVGVVVT....',
-    '.TVVVGGVVVVGGVVVT...',
-    '.TVGVVVVVVVVVVGVT...',
-    'TVVVVVVVVVVVVVVVVT..',
-    'TVVGVVVVVVVVVGVVVT..',
-    '.TVVVVVVVVVVVVVVT...',
-    '.TVVGVVVVVVVGVVT....',
-    '..TVVVVBBBVVVVT.....',
-    '...TTTTTTTTTTT......',
-    '....................',
+    '......TTTTTTTT......',
+    '....TTSSSSSSSSTT....',
+    '..TTSSSVVVVSSSSSTT..',
+    '.TSSSVVVVSSSSSSSSST.',
+    'TSSSSVVSSSSSSSSSSSST',
+    'TSSSSSSSSSSSST......',
+    'TSSGGGGGGGGTT.......',
+    'TSSSSSSSSSSSST......',
+    '.TSSSSSGSSSSSSSSSST.',
+    '..TTSSSSGSSSSSSSTT..',
+    '....TTBBBBBBBBTT....',
+    '......TTTTTTTT......',
   ]],
 }
 
 // ─────────────────────────────────────────────────────────────
-// LUNA CRECIENTE CON 3 ESTRELLAS
-// Tamaño lógico: 24x20 px — 2 frames: estrellas parpadean
+// LUNA CRECIENTE CON ESTRELLAS — 2 frames: las estrellas titilan
+// Tamaño lógico: 24x20 px
 // ─────────────────────────────────────────────────────────────
 const MOON_FRAME_1: string[] = [
-  'C...............C.......',
-  '........................',
+  '........TTTTTT..........',
+  '......TTCCCCTTTT.....H..',
+  '....TTCCCCTT............',
+  '...TCCCCCT..............',
+  '...TCCCCT..........H....',
   '..TCCCCT................',
-  '.TCCCCCCCT..............',
-  'TCCCCCCCCCT.............',
-  'TCCCCCCAACT.............',
-  'TCCCCAANCT..............',
-  'TCCCCCANCT..............',
-  'TCCCCCAAACT.............',
-  'TCCCCCCCCCT.....C.......',
-  'TCCCCCCCCCT.............',
-  '.TCCCCCCCCT.............',
-  '..TTCCCCCCT.............',
-  '.....TCCCT..............',
-  '.......TT...............',
-  '........................',
-  '.........C..............',
-  '........................',
-  '........................',
-  '........................',
+  '..TCHCCT................',
+  '.TCCCCT.................',
+  '.TCHCCT.......H.........',
+  '.TCHCCT......HHH........',
+  '.TCCCCT.......H.........',
+  '.TCCCCT.................',
+  '.THCCCT.................',
+  '..TCCCCT................',
+  '..TCCCCT..........H.....',
+  '...TCCCCT........HHH....',
+  '...TCCCCCT........H.....',
+  '....TTCCCCTT............',
+  '......TTCCCCTTTT........',
+  '........TTTTTT..........',
 ]
 
 const MOON_FRAME_2: string[] = [
-  '.....C..................',
-  '........................',
+  '........TTTTTT..........',
+  '......TTCCCCTTTT.....H..',
+  '....TTCCCCTT............',
+  '...TCCCCCT.........H....',
+  '...TCCCCT.........HHH...',
+  '..TCCCCT...........H....',
+  '..TCHCCT................',
+  '.TCCCCT.................',
+  '.TCHCCT.................',
+  '.TCHCCT.......H.........',
+  '.TCCCCT.................',
+  '.TCCCCT.................',
+  '.THCCCT.................',
   '..TCCCCT................',
-  '.TCCCCCCCT..............',
-  'TCCCCCCCCCT.............',
-  'TCCCCCCAACT.............',
-  'TCCCCAANCT..............',
-  'TCCCCCANCT..............',
-  'TCCCCCAAACT.............',
-  'TCCCCCCCCCT.............',
-  'TCCCCCCCCCT......C......',
-  '.TCCCCCCCCT.............',
-  '..TTCCCCCCT.............',
-  '.....TCCCT..............',
-  '.......TT...............',
-  '........................',
-  '........................',
-  '...........C............',
-  '........................',
-  '........................',
+  '..TCCCCT................',
+  '...TCCCCT.........H.....',
+  '...TCCCCCT..............',
+  '....TTCCCCTT............',
+  '......TTCCCCTTTT........',
+  '........TTTTTT..........',
 ]
 
 export const moonCrescent: SpriteDefinition = {
@@ -213,4 +213,3 @@ export const ALL_SPRITES: SpriteDefinition[] = [
   lilypad,
   moonCrescent,
 ]
-
