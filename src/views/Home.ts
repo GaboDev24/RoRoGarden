@@ -177,17 +177,22 @@ export function renderHome(container: HTMLElement): () => void {
   scene.setAttribute('aria-hidden', 'true') // decorativo
 
   const SCALE = 5
-  const SCENE_W = 20
-  const SCENE_H = 12 + 18 + 2 // nenúfar + sapo + espacio
+  const SCENE_W = 28
+  const SCENE_H = 24
   const { canvas, ctx } = createPixelCanvas(SCENE_W * SCALE, SCENE_H * SCALE)
 
   const instFrog = createSpriteInstance(frogIdle)
   const instPad = createSpriteInstance(lilypad)
 
+  const PAD_X = 0
+  const PAD_Y = 11
+  const FROG_X = 4
+  const FROG_Y = 2
+
   const animator = new SpriteAnimator(() => {
     ctx.clearRect(0, 0, SCENE_W * SCALE, SCENE_H * SCALE)
-    drawSprite(ctx, instPad, 0, (SCENE_H - 12) * SCALE, SCALE)
-    drawSprite(ctx, instFrog, 0, (SCENE_H - 12 - 18 + 2) * SCALE, SCALE)
+    drawSprite(ctx, instPad, PAD_X * SCALE, PAD_Y * SCALE, SCALE)
+    drawSprite(ctx, instFrog, FROG_X * SCALE, FROG_Y * SCALE, SCALE)
   })
 
   animator.add(instFrog)
@@ -238,8 +243,8 @@ export function renderHome(container: HTMLElement): () => void {
 
   // Dibujo inicial inmediato
   ctx.clearRect(0, 0, SCENE_W * SCALE, SCENE_H * SCALE)
-  drawSprite(ctx, instPad, 0, (SCENE_H - 12) * SCALE, SCALE)
-  drawSprite(ctx, instFrog, 0, (SCENE_H - 12 - 18 + 2) * SCALE, SCALE)
+  drawSprite(ctx, instPad, PAD_X * SCALE, PAD_Y * SCALE, SCALE)
+  drawSprite(ctx, instFrog, FROG_X * SCALE, FROG_Y * SCALE, SCALE)
 
   // Soporte de teclado para PC (Enter o Espacio)
   const handleKeyDown = (e: KeyboardEvent) => {

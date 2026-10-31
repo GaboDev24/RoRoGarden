@@ -62,15 +62,18 @@ npm run preview
 
 ## Navegación y Rutas (Hash Router)
 
-| Ruta          | Pantalla | Descripción |
-|---------------|----------|-------------|
-| `#/`          | Portada  | Pantalla de inicio con sapo animado y botón "Entrar al jardín". |
-| `#/jardin`    | Jardín   | Escenario central con accesos a Check-in, Diario, Historial y Ajustes. |
-| `#/checkin`   | Check-in | Selector de 5 estados emocionales (32x32), nota opcional y botón Saltar. |
-| `#/diario`    | Diario   | Reflexión nocturna en 3 preguntas saltables y ritual de cierre con luna. |
-| `#/historial` | Mis días | Historial cronológico con vista, edición y borrado (sin culpas ni rachas). |
-| `#/ajustes`   | Ajustes  | Respaldo JSON (exportar/importar), borrado total y notas de privacidad. |
-| `#/sprites`   | Dev Lab  | Laboratorio de desarrollo para inspección de todos los sprites. |
+| Ruta             | Pantalla  | Descripción |
+|------------------|-----------|-------------|
+| `#/`             | Portada   | Pantalla de inicio con sapo animado y botón "Entrar al jardín". |
+| `#/jardin`       | Jardín    | Escenario central con accesos a Una pausa, Check-in, Diario, Historial y Ajustes. |
+| `#/pausa`        | Una pausa | Selección de 3 micro-desafíos al azar, filtro por categoría y acceso a respiración. |
+| `#/desafio/:id`  | Desafío   | Ejecución paso a paso con temporizador continuo, Wake Lock y sapo animado. |
+| `#/respirar`     | Respirar  | Respiración guiada en 3 patrones, 3 duraciones y modo "Con mi sala". |
+| `#/checkin`      | Check-in  | Selector de 5 estados emocionales (32x32), nota opcional y botón Saltar. |
+| `#/diario`       | Diario    | Reflexión nocturna en 3 preguntas saltables y ritual de cierre con luna. |
+| `#/historial`    | Mis días  | Historial cronológico con vista, edición y borrado (sin culpas ni rachas). |
+| `#/ajustes`      | Ajustes   | Respaldo JSON, sonido/vibración, borrado total y notas de privacidad. |
+| `#/sprites`      | Dev Lab   | Laboratorio de desarrollo para inspección de todos los sprites. |
 
 ## Persistencia y Privacidad de Datos
 
@@ -80,20 +83,27 @@ Se eligió **`localStorage`** por las siguientes razones de arquitectura:
 2. **Ligereza y sincronía:** Evita dependencias de librerías asíncronas pesadas, garantizando una carga instantánea (cold start < 100ms) y rendimiento óptimo en celulares de gama media y baja.
 3. **Capacidad adecuada:** Una entrada diaria ocupa menos de 1 KB en JSON. La cuota estándar de 5 MB de `localStorage` permite más de 10 años ininterrumpidos de registros diarios.
 4. **Respaldo portable:** A través de la pantalla de Ajustes, la usuaria puede exportar e importar todos sus datos en un archivo JSON portable.
-5. **Esquema versionado y tolerancia a fallos:** Cada registro incluye el campo `version` (`CURRENT_SCHEMA_VERSION = 1`) y una función de migración extensible. Si el almacenamiento local es bloqueado por el navegador o modo incógnito, el sistema conmuta automáticamente a un búfer en memoria sin interrumpir la sesión de la usuaria.
+5. **Esquema versionado y tolerancia a fallos:** Cada registro incluye el campo `version` (`CURRENT_SCHEMA_VERSION = 2`) y una cadena de migraciones automáticas (`1 -> 2`). Si el almacenamiento local es bloqueado por el navegador o modo incógnito, el sistema conmuta automáticamente a un búfer en memoria sin interrumpir la sesión de la usuaria.
+6. **Registros silenciosos sin métricas (Etapa 3):** Al concluir o abandonar un micro-desafío o una sesión de respiración, se guarda en silencio un registro mínimo con fines de uso futuro. **No se muestra ningún contador, racha, porcentaje ni 'veces que hiciste X'**, preservando la promesa de una experiencia 100% libre de culpa o presión de logro. Estos registros se incluyen íntegramente en la exportación e importación de Ajustes.
+7. **Sonido y vibración opcionales:** La campana y la vibración háptica se sintetizan procedimentalmente mediante Web Audio API y la API de vibración, permanecen apagadas por defecto y pueden activarse desde Ajustes.
 
 ## Sprites incluidos
 
-- `frog-idle` — Sapo sentado, animación de respiración (2 frames)
+- `frog-idle` — Sapo sentado sobre nenúfar, animación de respiración (2 frames)
 - `frog-sleeping` — Sapo dormido
 - `mushroom` — Hongo con sombrero
-- `lilypad` — Nenúfar flotante
+- `lilypad` — Nenúfar flotante (28x12)
 - `moon-crescent` — Luna creciente con 3 estrellas titilantes
 - `frog-contenta` — Sapo contento (32x32, expresión alegre)
 - `frog-tranquila` — Sapo tranquilo (32x32, expresión serena)
 - `frog-cansada` — Sapo cansado (32x32, párpados caídos)
 - `frog-tensa` — Sapo tenso (32x32, ojos alerta, línea apretada)
 - `frog-triste` — Sapo triste (32x32, ojos caídos y lágrima suave)
+- `frog-inhaling` — Sapo inhalando con pecho y vientre inflado (32x32)
+- `frog-exhaling` — Sapo exhalando con aliento suave (32x32)
+- `frog-breathing` — Ciclo de respiración animado de 2 cuadros (32x32)
+- `frog-stretching` — Sapo estirando brazos y cuello (32x32)
+- `frog-ears` — Sapo tapándose los oídos en momento de silencio (32x32)
 
 ## Principios del proyecto
 

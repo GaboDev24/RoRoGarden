@@ -370,7 +370,10 @@ export function renderHistorial(container: HTMLElement): () => void {
   const renderList = () => {
     listContainer.innerHTML = ''
     const res = listEntries()
-    const entries: GardenEntry[] = res.success && res.data ? res.data : []
+    // "Mis días" muestra exclusivamente los registros reflexivos (checkin y diario).
+    // Los registros silenciosos de pausa se preservan en storage y respaldo para uso futuro sin métricas.
+    const allEntries: GardenEntry[] = res.success && res.data ? res.data : []
+    const entries = allEntries.filter((e) => e.type === 'checkin' || e.type === 'diario')
 
     if (entries.length === 0) {
       const empty = document.createElement('div')
@@ -412,7 +415,7 @@ export function renderHistorial(container: HTMLElement): () => void {
       const moodRow = document.createElement('div')
       moodRow.className = 'entry-mood-row'
 
-      const moodKey = entry.data.mood as MoodType
+      const moodKey = ('mood' in entry.data ? entry.data.mood : undefined) as MoodType | undefined
       if (moodKey && MOOD_SPRITES[moodKey]) {
         const SCALE = 1
         const { canvas, ctx } = createPixelCanvas(32 * SCALE, 32 * SCALE)
@@ -424,7 +427,7 @@ export function renderHistorial(container: HTMLElement): () => void {
 
       const moodLabel = document.createElement('span')
       moodLabel.className = 'entry-mood-label'
-      moodLabel.textContent = copy.moods[moodKey]?.label ?? moodKey
+      moodLabel.textContent = (moodKey && copy.moods[moodKey]?.label) ?? (moodKey ?? '')
 
       moodRow.appendChild(moodLabel)
 

@@ -66,17 +66,18 @@ La paleta, tipografía y reglas visuales están en `design.md`. Nunca hardcodear
 
 ---
 
-## 📁 Alcance de Etapa 2 (Completada)
+## 📁 Alcance de Etapa 3 (Completada)
 
 Se implementó:
-- Router nativo por hash (`#/`, `#/jardin`, `#/checkin`, `#/diario`, `#/historial`, `#/ajustes`, `#/sprites`)
-- Módulo centralizado de textos `src/copy.ts` en español rioplatense
-- 5 sprites originales 32x32 de expresiones emocionales (contenta, tranquila, cansada, tensa, triste)
-- Pantalla Check-in con selector de estados, nota opcional y botón Saltar con igual peso
-- Pantalla Diario de cierre con 3 preguntas reflexivas saltables y ritual nocturno con luna
-- Módulo de almacenamiento local `src/storage` (localStorage) con esquema versionado (`version: 1`), tolerancia a fallos y tests en Vitest
-- Pantalla Mis Días (historial con ver, editar y borrar sin culpas ni métricas de rachas)
-- Pantalla de Ajustes con exportar/importar JSON y borrado total con doble confirmación
+- Pantalla "Una pausa" (`#/pausa`) con 3 micro-desafíos al azar, filtro por categoría, botón "Otras ideas", acceso a respiración y botón "Ahora no"
+- Banco de 18 micro-desafíos originales en `src/challenges.ts` (Voz, Cuerpo, Silencio, Respiración, Ánimo) con notas de cuidado
+- Pantalla de ejecución de desafíos (`#/desafio/:id`) paso a paso con temporizador continuo por timestamps, Screen Wake Lock API y sapo acompañante
+- Respiración guiada (`#/respirar`) en 3 patrones (Suave, Cuadrada, Corta), 3 duraciones, modo "Con mi sala", guía visual pixel art con respeto a `prefers-reduced-motion` y accesibilidad `aria-live`
+- Síntesis de sonido de campana suave y vibración háptica con Web Audio API (`src/audio/index.ts`), desactivados por defecto y configurables en Ajustes
+- Módulo de selección pura desacoplado del DOM (`src/pick.ts`)
+- Esquema de almacenamiento versionado v2 (`src/storage/`), con migraciones automáticas v1 -> v2 y guardado silencioso sin métricas ni culpas
+- 4 nuevos sprites 32x32: sapo inhalando, sapo exhalando, sapo estirándose y sapo con manos en los oídos
+- Tests unitarios completos en Vitest para respiración, selección y persistencia (18 tests pasando)
 
-**No implementar todavía:** respiración guiada, micro-desafíos, jardín que crece o cambia, resumen semanal, recordatorios o notificaciones, cuentas o sincronización, detección automática de estados de ánimo.
+**No implementar todavía:** jardín que crece o cambia según las pausas, resumen semanal, recordatorios o notificaciones, cuentas o sincronización, funciones específicas para niños más allá del modo de visualización de la respiración.
 

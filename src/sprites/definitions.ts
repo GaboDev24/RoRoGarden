@@ -26,6 +26,7 @@ import type { SpriteDefinition } from './renderer'
 // ─────────────────────────────────────────────────────────────
 // SAPO SENTADO — idle de 2 cuadros (ojos abiertos / ojos cerrados)
 // Tamaño lógico: 20x18 px
+// Sentado sobre el nenúfar con ancas plegadas a los lados y patitas apoyadas.
 // ─────────────────────────────────────────────────────────────
 const FROG_IDLE_FRAME_1: string[] = [
   '.......TTTTTT.......',
@@ -41,11 +42,11 @@ const FROG_IDLE_FRAME_1: string[] = [
   '.TSSSSSSSTTSSSSSSST.',
   '.TSSGSSMMMMMMSSGSST.',
   '.TSSSMMMMMMMMMMSSST.',
-  '..TSSMMMMMMMMMMSST..',
-  '...TSSSSSSSSSSSST...',
-  '..TSSSTTTTTTTTSSST..',
-  '..TTTTT......TTTTT..',
-  '....................',
+  'TSSSSMMMMMMMMMMSSSST',
+  'TSGSSMMMMMMMMMMSSGST',
+  '.TSSSTTMMMMMMTTSSST.',
+  '..TTSSSTSSSSTSSSTT..',
+  '...TTTT.TTTT.TTTT...',
 ]
 
 // Frame 2: ojos cerrados contentos (parpadeo)
@@ -63,11 +64,11 @@ const FROG_IDLE_FRAME_2: string[] = [
   '.TSSSSSSSTTSSSSSSST.',
   '.TSSGSSMMMMMMSSGSST.',
   '.TSSSMMMMMMMMMMSSST.',
-  '..TSSMMMMMMMMMMSST..',
-  '...TSSSSSSSSSSSST...',
-  '..TSSSTTTTTTTTSSST..',
-  '..TTTTT......TTTTT..',
-  '....................',
+  'TSSSSMMMMMMMMMMSSSST',
+  'TSGSSMMMMMMMMMMSSGST',
+  '.TSSSTTMMMMMMTTSSST.',
+  '..TTSSSTSSSSTSSSTT..',
+  '...TTTT.TTTT.TTTT...',
 ]
 
 export const frogIdle: SpriteDefinition = {
@@ -129,23 +130,23 @@ export const mushroom: SpriteDefinition = {
 
 // ─────────────────────────────────────────────────────────────
 // NENÚFAR FLOTANTE — hoja con muesca, vena y reflejo
-// Tamaño lógico: 20x12 px
+// Tamaño lógico: 28x12 px
 // ─────────────────────────────────────────────────────────────
 export const lilypad: SpriteDefinition = {
   id: 'lilypad',
   frames: [[
-    '......TTTTTTTT......',
-    '....TTSSSSSSSSTT....',
-    '..TTSSSVVVVSSSSSTT..',
-    '.TSSSVVVVSSSSSSSSST.',
-    'TSSSSVVSSSSSSSSSSSST',
-    'TSSSSSSSSSSSST......',
-    'TSSGGGGGGGGTT.......',
-    'TSSSSSSSSSSSST......',
-    '.TSSSSSGSSSSSSSSSST.',
-    '..TTSSSSGSSSSSSSTT..',
-    '....TTBBBBBBBBTT....',
-    '......TTTTTTTT......',
+    '........TTTTTTTTTTTT........',
+    '.....TTTSSSSSSSSSSSSSTT.....',
+    '...TTSSSSVVVVVSSSSSSSSSTT...',
+    '..TSSSSVVVVSSSSSSSSSSSSSST..',
+    '.TSSSSSVVSSSSSSSSSSSSSSSSST.',
+    'TSSSSSSSSSSSSSSSSSTTTTT.....',
+    'TSSGGGGGGGGGGGGSTT..........',
+    'TSSSSSSSSSSSSSSSSSTTTTT.....',
+    '.TSSSSSSSSGSSSSSSSSSSSSSSST.',
+    '..TTSSSSSSSGSSSSSSSSSSSSSTT.',
+    '....TTTBBBBBBBBBBBBBBTTT....',
+    '.......TTTTTTTTTTTTTT.......',
   ]],
 }
 
@@ -413,6 +414,177 @@ export const MOOD_SPRITES = {
   triste: frogTriste,
 } as const
 
+// ─────────────────────────────────────────────────────────────
+// SPRITES DE PAUSA Y RESPIRACIÓN (32x32) — ETAPA 3
+// Sapo inhalando, exhalando, estirándose y con manos en los oídos
+// ─────────────────────────────────────────────────────────────
+
+// Sapo inhalando: cuerpo y panza hinchada, pecho amplio lleno de aire
+const FROG_INHALE_FRAME: string[] = [
+  '................................',
+  '................................',
+  '...........TTTTTTTTTT...........',
+  '.........TTSSGSSSSGSSTT.........',
+  '.......TTSGSSSSSSSSSSGSTT.......',
+  '......TSSSSSSSSSSSSSSSSSST......',
+  '.....TSSSSSSSSSSSSSSSSSSSST.....',
+  '....TSSSSSSSSSSSSSSSSSSSSSST....',
+  '....TSSSTSSSSTSSSSSSTSSSSTSSST..',
+  '...TSSSSSTTTTSSSSSSSSTTTTSSSSST.',
+  '..TSSSSSSSSSSSSSSSSSSSSSSSSSSST.',
+  '..TSSSHHHSSSSSSSSSSSSSSHHHSSSST.',
+  '..TSSSSSSSSSTTTTTTTTSSSSSSSSSST.',
+  '..TSSSSSSSSSSSTTTTSSSSSSSSSSSST.',
+  '.TSGSSSSSSSSSSSSSSSSSSSSSSSSGST.',
+  '.TSSSSSSSSMMMMMMMMMMSSSSSSSSST..',
+  'TSSSSSSSMMMMMMMMMMMMMMSSSSSSSST.',
+  'TSSSSSSMMMMMMMMMMMMMMMMSSSSSSST.',
+  'TSSGSSMMMMMMMMMMMMMMMMMMSSGSSST.',
+  'TSSSSMMMMMMMMMMMMMMMMMMMMSSSSST.',
+  'TSSSSMMMMMMMMMMMMMMMMMMMMSSSSST.',
+  'TSSGSSMMMMMMMMMMMMMMMMMMSSGSSST.',
+  '.TSSSSMMMMMMMMMMMMMMMMMMSSSSST..',
+  '.TSSSSSSMMMMMMMMMMMMMMSSSSSSST..',
+  '..TSSSSSSMMMMMMMMMMMMSSSSSSST...',
+  '...TGSSSSSSMMMMMMMMSSSSSSGT.....',
+  '...TSSSSSSSSSTTTTSSSSSSSSST.....',
+  '....TSSSSSSGT....TGSSSSSSST.....',
+  '.....TTTTTT........TTTTTT.......',
+  '................................',
+  '................................',
+  '................................',
+]
+
+// Sapo exhalando: relajado, soltando el aire despacito con aliento suave
+const FROG_EXHALE_FRAME: string[] = [
+  '................................',
+  '................................',
+  '................................',
+  '...........TTTTTTTTTT...........',
+  '.........TTSSGSSSSGSSTT.........',
+  '.......TTSGSSSSSSSSSSGSTT.......',
+  '......TSSSSSSSSSSSSSSSSSST......',
+  '.....TSSSSSSSSSSSSSSSSSSSST.....',
+  '....TSSSSSSSSSSSSSSSSSSSSSST....',
+  '....TSSSTSSSSTSSSSSSTSSSSTSSST..',
+  '...TSSSSSTTTTSSSSSSSSTTTTSSSSST.',
+  '..TSSSSSSSSSSSSSSSSSSSSSSSSSSST.',
+  '..TSSSHHHSSSSSSSSSSSSSSHHHSSSST.',
+  '..TSSSSSSSSSSSTTTTSSSSSSSSSSSST.',
+  '..TSSSSSSSSSSTACASTSSSSSSSSSSST.',
+  '..TSGSSSSSSSSSTTTTSSSSSSSSSGST..',
+  '...TSSSSSSSSMMMMMMMMSSSSSSSST...',
+  '...TSSSSSSMMMMMMMMMMMMSSSSSST...',
+  '....TGSSSMMMMMMMMMMMMMMSSSGT....',
+  '....TSSSSMMMMMMMMMMMMMMSSSST....',
+  '.....TSSSMMMMMMMMMMMMMMSSST.....',
+  '......TSSMMMMMMMMMMMMMMSST......',
+  '.....TSSSSMMMMMMMMMMMMSSST......',
+  '....TSSSSSSSMMMMMMMMSSSSSST.....',
+  '....TSSSSSSSSTTTTTSSSSSSSST.....',
+  '.....TGSSSSGT.....TSGSSSST......',
+  '......TTTTTT.......TTTTTT.......',
+  '................................',
+  '................................',
+  '................................',
+  '................................',
+  '................................',
+]
+
+export const frogInhaling: SpriteDefinition = {
+  id: 'frog-inhaling',
+  frames: [FROG_INHALE_FRAME],
+}
+
+export const frogExhaling: SpriteDefinition = {
+  id: 'frog-exhaling',
+  frames: [FROG_EXHALE_FRAME],
+}
+
+export const frogBreathing: SpriteDefinition = {
+  id: 'frog-breathing',
+  frames: [FROG_INHALE_FRAME, FROG_EXHALE_FRAME],
+  frameMs: 4000,
+}
+
+// Sapo estirándose: brazos y cuello estirados hacia arriba con gran alivio
+export const frogStretching: SpriteDefinition = {
+  id: 'frog-stretching',
+  frames: [[
+    '....TTTT..............TTTT......',
+    '...TSSSSST..........TSSSSST.....',
+    '...TSGSSST..........TSGSSST.....',
+    '....TSSSSST........TSSSSST......',
+    '.....TSSSSSTTTTTTTTSSSSST.......',
+    '......TTSGSSGSSSSGSSTTST........',
+    '......TSSSSSSSSSSSSSSSSSST......',
+    '.....TSSSSSSSSSSSSSSSSSSSST.....',
+    '....TSSSSSSSSSSSSSSSSSSSSSST....',
+    '....TSSSTSSSSTSSSSSSTSSSSTSSST..',
+    '...TSSSSSTTTTSSSSSSSSTTTTSSSSST.',
+    '..TSSSSSSSSSSSSSSSSSSSSSSSSSSST.',
+    '..TSSSHHHSSSSSSSSSSSSSSHHHSSSST.',
+    '..TSSSSSSSSSTTTTTTTTSSSSSSSSSST.',
+    '..TSSSSSSSSSTHHHHHHTSSSSSSSSSST.',
+    '..TSGSSSSSSSSTTTTTTSSSSSSSSGST..',
+    '...TSSSSSSSSMMMMMMMMSSSSSSSST...',
+    '...TSSSSSSMMMMMMMMMMMMSSSSSST...',
+    '....TGSSSMMMMMMMMMMMMMMSSSGT....',
+    '....TSSSSMMMMMMMMMMMMMMSSSST....',
+    '.....TSSSMMMMMMMMMMMMMMSSST.....',
+    '......TSSMMMMMMMMMMMMMMSST......',
+    '.....TSSSSMMMMMMMMMMMMSSST......',
+    '....TSSSSSSSMMMMMMMMSSSSSST.....',
+    '....TSSSSSSSSTTTTTSSSSSSSST.....',
+    '.....TGSSSSGT.....TSGSSSST......',
+    '......TTTTTT.......TTTTTT.......',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+  ]],
+}
+
+// Sapo con las manos en los oídos: tapándose los oídos a los costados de la cabeza
+export const frogEars: SpriteDefinition = {
+  id: 'frog-ears',
+  frames: [[
+    '................................',
+    '................................',
+    '................................',
+    '...........TTTTTTTTTT...........',
+    '.........TTSSGSSSSGSSTT.........',
+    '.......TTSGSSSSSSSSSSGSTT.......',
+    '......TSSSSSSSSSSSSSSSSSST......',
+    '..TTTTSSSSSSSSSSSSSSSSSSSSTTTT..',
+    '.TSSSSTSSSSSSSSSSSSSSSSSSSTSSSST',
+    '.TSGSSTTSSSSTSSSSSSTSSSSTTTSGSST',
+    '.TSSSSSTTTTTSSSSSSSSTTTTTSSSSST.',
+    '..TSSSTSSSSSSSSSSSSSSSSSSSTSSST.',
+    '...TTTSSHHHSSSSSSSSSSSSHHHSSTTT.',
+    '....TSSSSSSSSTTTTTTSSSSSSSSST...',
+    '....TSSSSSSSSTSSSSTSSSSSSSSST...',
+    '....TSGSSSSSSSTTTTSSSSSSSSGST...',
+    '.....TSSSSSSMMMMMMMMSSSSSSST....',
+    '.....TSSSSSMMMMMMMMMMSSSSST.....',
+    '.....TGSSSMMMMMMMMMMMMSSSGT.....',
+    '.....TSSSSMMMMMMMMMMMMSSSST.....',
+    '......TSSSMMMMMMMMMMMMSSST......',
+    '.......TSSMMMMMMMMMMMMSST.......',
+    '......TSSSSMMMMMMMMMMMSSST......',
+    '.....TSSSSSSSMMMMMMMMSSSSSST....',
+    '.....TSSSSSSSSTTTTTSSSSSSSST....',
+    '......TGSSSSGT.....TSGSSSST.....',
+    '.......TTTTTT.......TTTTTT......',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+  ]],
+}
+
 // Exportar todos juntos para conveniencia (desarrollo y tests)
 export const ALL_SPRITES: SpriteDefinition[] = [
   frogIdle,
@@ -425,4 +597,9 @@ export const ALL_SPRITES: SpriteDefinition[] = [
   frogCansada,
   frogTensa,
   frogTriste,
+  frogInhaling,
+  frogExhaling,
+  frogBreathing,
+  frogStretching,
+  frogEars,
 ]

@@ -1,6 +1,12 @@
 import { copy } from '../copy'
 import { faIconHtml } from '../icons'
 import {
+  isSoundEnabled,
+  setSoundEnabled,
+  isVibrationEnabled,
+  setVibrationEnabled,
+} from '../audio'
+import {
   exportBackup,
   importBackup,
   clearAllEntries,
@@ -284,6 +290,54 @@ export function renderAjustes(container: HTMLElement): () => void {
     }, 3000)
   }
 
+  // ── 0. Sonido y vibración ──
+  const audioGroup = document.createElement('div')
+  audioGroup.className = 'settings-group'
+
+  const audioTitle = document.createElement('h2')
+  audioTitle.className = 'group-title'
+  audioTitle.textContent = copy.ajustes.audioTitle
+
+  // Toggle sonido
+  const soundLabelRow = document.createElement('label')
+  soundLabelRow.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); cursor: pointer; min-height: var(--touch-target-min);'
+  const soundLabelText = document.createElement('span')
+  soundLabelText.className = 'group-desc'
+  soundLabelText.style.margin = '0'
+  soundLabelText.textContent = copy.ajustes.soundLabel
+  const soundCheck = document.createElement('input')
+  soundCheck.type = 'checkbox'
+  soundCheck.style.cssText = 'width: 22px; height: 22px; accent-color: var(--color-bosque); cursor: pointer;'
+  soundCheck.checked = isSoundEnabled()
+  soundCheck.addEventListener('change', () => {
+    setSoundEnabled(soundCheck.checked)
+    showToast('Preferencia de sonido actualizada')
+  })
+  soundLabelRow.appendChild(soundLabelText)
+  soundLabelRow.appendChild(soundCheck)
+
+  // Toggle vibración
+  const vibLabelRow = document.createElement('label')
+  vibLabelRow.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); cursor: pointer; min-height: var(--touch-target-min);'
+  const vibLabelText = document.createElement('span')
+  vibLabelText.className = 'group-desc'
+  vibLabelText.style.margin = '0'
+  vibLabelText.textContent = copy.ajustes.vibrationLabel
+  const vibCheck = document.createElement('input')
+  vibCheck.type = 'checkbox'
+  vibCheck.style.cssText = 'width: 22px; height: 22px; accent-color: var(--color-bosque); cursor: pointer;'
+  vibCheck.checked = isVibrationEnabled()
+  vibCheck.addEventListener('change', () => {
+    setVibrationEnabled(vibCheck.checked)
+    showToast('Preferencia de vibración actualizada')
+  })
+  vibLabelRow.appendChild(vibLabelText)
+  vibLabelRow.appendChild(vibCheck)
+
+  audioGroup.appendChild(audioTitle)
+  audioGroup.appendChild(soundLabelRow)
+  audioGroup.appendChild(vibLabelRow)
+
   // ── 1. Exportar datos ──
   const exportGroup = document.createElement('div')
   exportGroup.className = 'settings-group'
@@ -518,6 +572,7 @@ export function renderAjustes(container: HTMLElement): () => void {
   section.appendChild(header)
   section.appendChild(privacyCard)
   if (storageWarning) section.appendChild(storageWarning)
+  section.appendChild(audioGroup)
   section.appendChild(exportGroup)
   section.appendChild(importGroup)
   section.appendChild(clearGroup)

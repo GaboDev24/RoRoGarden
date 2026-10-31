@@ -6,6 +6,9 @@ import { renderDiario } from './views/Diario'
 import { renderHistorial } from './views/Historial'
 import { renderAjustes } from './views/Ajustes'
 import { renderSpritesLab } from './views/SpritesLab'
+import { renderPausa } from './views/Pausa'
+import { renderDesafio } from './views/Desafio'
+import { renderRespirar } from './views/Respirar'
 import { createFaIcon } from './icons'
 
 /**
@@ -48,26 +51,38 @@ function navigate(): void {
 
   app.classList.remove('container-wide')
 
-  switch (route) {
-    case '#/jardin':
-      currentCleanup = renderJardin(app)
-      break
-    case '#/checkin':
-      currentCleanup = renderCheckin(app)
-      break
-    case '#/diario':
-      currentCleanup = renderDiario(app)
-      break
-    case '#/historial':
-      currentCleanup = renderHistorial(app)
-      break
-    case '#/ajustes':
-      currentCleanup = renderAjustes(app)
-      break
-    case '#/':
-    default:
-      currentCleanup = renderHome(app)
-      break
+  if (route.startsWith('#/desafio')) {
+    const parts = route.split('/')
+    const challengeId = parts[2] || ''
+    currentCleanup = renderDesafio(app, challengeId)
+  } else {
+    switch (route) {
+      case '#/jardin':
+        currentCleanup = renderJardin(app)
+        break
+      case '#/pausa':
+        currentCleanup = renderPausa(app)
+        break
+      case '#/respirar':
+        currentCleanup = renderRespirar(app)
+        break
+      case '#/checkin':
+        currentCleanup = renderCheckin(app)
+        break
+      case '#/diario':
+        currentCleanup = renderDiario(app)
+        break
+      case '#/historial':
+        currentCleanup = renderHistorial(app)
+        break
+      case '#/ajustes':
+        currentCleanup = renderAjustes(app)
+        break
+      case '#/':
+      default:
+        currentCleanup = renderHome(app)
+        break
+    }
   }
 
   // Link discreto a /sprites en modo desarrollo

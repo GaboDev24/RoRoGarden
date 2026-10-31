@@ -7,6 +7,8 @@ import {
   clearAllEntries,
   exportBackup,
   importBackup,
+  migrateEntry,
+  savePauseEntry,
   CURRENT_SCHEMA_VERSION,
 } from '../src/storage'
 import type { GardenEntry } from '../src/storage/types'
@@ -168,6 +170,57 @@ describe('Módulo de Almacenamiento Local (RoRoGarden)', () => {
     expect(validImport.success).toBe(true)
     expect(validImport.data?.imported).toBe(1)
     expect(getEntry('checkin_2026-10-31').data).not.toBeNull()
+  })
+
+  it('migra automáticamente registros de versión 1 a versión 2', () => {
+    const rawV1 = {
+      id: 'checkin_2026-10-20',
+      version: 1,
+      type: 'checkin',
+      date: '2026-10-20',
+      createdAt: '2026-10-20T10:00:00.000Z',
+      updatedAt: '2026-10-20T10:00:00.000Z',
+      data: { mood: 'tranquila' },
+    }
+
+    const migrated = migrateEntry(rawV1)
+    expect(migrated.version).toBe(CURRENT_SCHEMA_VERSION)
+    expect(migrated.version).toBe(2)
+    expect(migrated.id).toBe('checkin_2026-10-20')
+    expect(migrated.data).toEqual({ mood: 'tranquila' })
+  })
+
+  it('guarda registros de pausas (desafíos y respiración) en silencio y los incluye en exportación', () => {
+    const resDesafio = savePauseEntry('desafio', {
+      challengeId: 'cuerpo-cuello',
+      title: 'Estirar cuello y hombros',
+      category: 'cuerpo',
+      durationSeconds: 60,
+      completed: true,
+    }, '2026-10-31')
+
+    expect(resDesafio.success).toBe(true)
+    expect(resDesafio.data?.type).toBe('desafio')
+    expect(resDesafio.data?.version).toBe(2)
+
+    const resResp = savePauseEntry('respiracion', {
+      pattern: 'suave',
+      durationSeconds: 120,
+      salaMode: false,
+      completed: true,
+    }, '2026-10-31')
+
+    expect(resResp.success).toBe(true)
+    expect(resResp.data?.type).toBe('respiracion')
+
+    const listRes = listEntries()
+    expect(listRes.success).toBe(true)
+    expect(listRes.data?.length).toBe(2)
+
+    const backup = exportBackup()
+    expect(backup.success).toBe(true)
+    expect(backup.data).toContain('cuerpo-cuello')
+    expect(backup.data).toContain('respiracion')
   })
 })
 

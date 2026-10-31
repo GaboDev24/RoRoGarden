@@ -214,17 +214,22 @@ export function renderJardin(container: HTMLElement): () => void {
   pond.setAttribute('aria-hidden', 'true')
 
   const SCALE = 5
-  const SCENE_W = 20
-  const SCENE_H = 12 + 18 + 2
+  const SCENE_W = 28
+  const SCENE_H = 24
   const { canvas, ctx } = createPixelCanvas(SCENE_W * SCALE, SCENE_H * SCALE)
 
   const instFrog = createSpriteInstance(frogIdle)
   const instPad = createSpriteInstance(lilypad)
 
+  const PAD_X = 0
+  const PAD_Y = 11
+  const FROG_X = 4
+  const FROG_Y = 2
+
   const animator = new SpriteAnimator(() => {
     ctx.clearRect(0, 0, SCENE_W * SCALE, SCENE_H * SCALE)
-    drawSprite(ctx, instPad, 0, (SCENE_H - 12) * SCALE, SCALE)
-    drawSprite(ctx, instFrog, 0, (SCENE_H - 12 - 18 + 2) * SCALE, SCALE)
+    drawSprite(ctx, instPad, PAD_X * SCALE, PAD_Y * SCALE, SCALE)
+    drawSprite(ctx, instFrog, FROG_X * SCALE, FROG_Y * SCALE, SCALE)
   })
 
   animator.add(instFrog)
@@ -237,8 +242,17 @@ export function renderJardin(container: HTMLElement): () => void {
   const actions = document.createElement('div')
   actions.className = 'jardin-actions'
 
+  const pausaBtn = document.createElement('button')
+  pausaBtn.className = 'action-btn'
+  const spaIcon = createFaIcon('spa', { size: 18 })
+  pausaBtn.appendChild(spaIcon)
+  pausaBtn.appendChild(document.createTextNode(copy.jardin.pausaBtn))
+  pausaBtn.addEventListener('click', () => {
+    window.location.hash = '#/pausa'
+  })
+
   const checkinBtn = document.createElement('button')
-  checkinBtn.className = 'action-btn'
+  checkinBtn.className = 'action-btn secondary'
   const frogIcon = createFaIcon('frog', { size: 18 })
   checkinBtn.appendChild(frogIcon)
   checkinBtn.appendChild(document.createTextNode(copy.jardin.checkinBtn))
@@ -264,6 +278,7 @@ export function renderJardin(container: HTMLElement): () => void {
     window.location.hash = '#/historial'
   })
 
+  actions.appendChild(pausaBtn)
   actions.appendChild(checkinBtn)
   actions.appendChild(diarioBtn)
   actions.appendChild(historialBtn)
@@ -277,8 +292,8 @@ export function renderJardin(container: HTMLElement): () => void {
 
   // Primer dibujo inmediato
   ctx.clearRect(0, 0, SCENE_W * SCALE, SCENE_H * SCALE)
-  drawSprite(ctx, instPad, 0, (SCENE_H - 12) * SCALE, SCALE)
-  drawSprite(ctx, instFrog, 0, (SCENE_H - 12 - 18 + 2) * SCALE, SCALE)
+  drawSprite(ctx, instPad, PAD_X * SCALE, PAD_Y * SCALE, SCALE)
+  drawSprite(ctx, instFrog, FROG_X * SCALE, FROG_Y * SCALE, SCALE)
 
   // Foco inicial accesible
   checkinBtn.focus()

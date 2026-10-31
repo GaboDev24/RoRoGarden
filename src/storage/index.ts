@@ -2,19 +2,27 @@ import type {
   GardenEntry,
   StorageResult,
   BackupPayload,
+  EntryType,
+  DesafioPayload,
+  RespiracionPayload,
 } from './types'
 
-export const CURRENT_SCHEMA_VERSION = 1
+export const CURRENT_SCHEMA_VERSION = 2
 const STORAGE_PREFIX = 'roro_entry_'
 const BACKUP_APP_NAME = 'RoRoGarden'
 
 /**
  * Tabla de migraciones por versión.
- * Si en el futuro se incrementa CURRENT_SCHEMA_VERSION a 2,
- * se agrega aquí la función que transforma datos de v1 a v2.
+ * Transforma datos desde versiones anteriores hasta la versión actual.
  */
 export const MIGRATIONS: Record<number, (entry: any) => any> = {
-  // 1: (entry) => { ... return migratedEntry }
+  1: (entry) => {
+    // Migración de v1 a v2: actualiza el número de versión conservando integridad
+    return {
+      ...entry,
+      version: 2,
+    }
+  },
 }
 
 /**
@@ -50,10 +58,36 @@ export function getLocalDateString(date: Date = new Date()): string {
 }
 
 /**
- * Crea el identificador único canónico: ${type}_${YYYY-MM-DD}
+ * Crea el identificador único canónico: ${type}_${YYYY-MM-DD} o ${type}_${YYYY-MM-DD}_${suffix}
  */
-export function makeEntryId(type: 'checkin' | 'diario', dateStr: string): string {
+export function makeEntryId(type: EntryType, dateStr: string, suffix?: string): string {
+  if (suffix) {
+    return `${type}_${dateStr}_${suffix}`
+  }
   return `${type}_${dateStr}`
+}
+
+/**
+ * Guarda en silencio un registro de pausa (micro-desafío o respiración)
+ * sin interrumpir la experiencia de la usuaria.
+ */
+export function savePauseEntry(
+  type: 'desafio' | 'respiracion',
+  payload: DesafioPayload | RespiracionPayload,
+  dateStr: string = getLocalDateString()
+): StorageResult<GardenEntry> {
+  const timestamp = Date.now().toString()
+  const nowIso = new Date().toISOString()
+  const entry: GardenEntry = {
+    id: makeEntryId(type, dateStr, timestamp),
+    version: CURRENT_SCHEMA_VERSION,
+    type,
+    date: dateStr,
+    createdAt: nowIso,
+    updatedAt: nowIso,
+    data: payload,
+  }
+  return saveEntry(entry)
 }
 
 /**
