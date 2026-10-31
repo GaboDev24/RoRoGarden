@@ -12,33 +12,32 @@ import {
 
 /**
  * Pantalla de inicio de RoRoGarden.
- * Diseñada según los principios Hallmark (modo custom):
- * - Fondo celeste/menta
- * - Sapo animado sobre nenúfar
- * - Botón táctil grande de al menos 48px
- * - Contraste WCAG AA
- * - prefers-reduced-motion respetado
+ * Diseñada según los principios Hallmark (modo custom) y mobile-first con adaptación para PC:
+ * - Marco contenedor centrado y armónico en PC; inmersivo y fullscreen en celular.
+ * - Sapo animado sobre nenúfar con renderizado pixel-perfect.
+ * - Botón accesible táctil y de teclado (Enter / Espacio).
+ * - Contraste WCAG AA y respeto estricto de prefers-reduced-motion.
  */
 export function renderHome(container: HTMLElement): () => void {
   container.innerHTML = ''
 
-  // ── Fondo gradiente suave ──
   const section = document.createElement('section')
   section.className = 'home-screen'
   section.setAttribute('role', 'main')
   section.setAttribute('aria-label', 'Pantalla de inicio de RoRoGarden')
 
-  // Inyectar estilos scoped
   const style = document.createElement('style')
   style.textContent = `
     .home-screen {
       flex: 1;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
       padding: var(--space-xl) var(--space-md) var(--space-lg);
-      min-height: 100dvh;
       background: linear-gradient(
         180deg,
         var(--color-celeste-agua) 0%,
@@ -61,6 +60,7 @@ export function renderHome(container: HTMLElement): () => void {
       color: var(--color-bosque);
       letter-spacing: 0.05em;
       line-height: 2;
+      margin: 0;
     }
 
     .home-subtitle {
@@ -68,8 +68,9 @@ export function renderHome(container: HTMLElement): () => void {
       font-size: var(--font-size-md);
       color: var(--color-agua-profunda);
       text-align: center;
-      max-width: 240px;
+      max-width: 260px;
       line-height: 1.5;
+      margin: 0;
     }
 
     .home-scene {
@@ -79,6 +80,7 @@ export function renderHome(container: HTMLElement): () => void {
       gap: var(--space-sm);
       flex: 1;
       justify-content: center;
+      margin: var(--space-sm) 0;
     }
 
     .home-scene canvas {
@@ -89,7 +91,7 @@ export function renderHome(container: HTMLElement): () => void {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--space-md);
+      gap: var(--space-sm);
       width: 100%;
     }
 
@@ -110,12 +112,15 @@ export function renderHome(container: HTMLElement): () => void {
       text-align: center;
     }
 
-    .btn-enter:hover {
-      opacity: 0.88;
+    @media (hover: hover) {
+      .btn-enter:hover {
+        opacity: 0.92;
+        transform: translateY(-2px);
+      }
     }
 
     .btn-enter:active {
-      transform: scale(0.96);
+      transform: translateY(1px) scale(0.98);
     }
 
     .btn-enter:focus-visible {
@@ -128,6 +133,23 @@ export function renderHome(container: HTMLElement): () => void {
       font-size: var(--font-size-xs);
       color: var(--color-musgo);
       text-align: center;
+      margin: 0;
+    }
+
+    .desktop-hint {
+      display: none;
+      font-family: var(--font-ui);
+      font-size: var(--font-size-xs);
+      color: var(--color-bosque);
+      text-align: center;
+      margin: 0;
+      opacity: 0.85;
+    }
+
+    @media (min-width: 601px) {
+      .desktop-hint {
+        display: block;
+      }
     }
   `
   document.head.appendChild(style)
@@ -152,7 +174,6 @@ export function renderHome(container: HTMLElement): () => void {
   scene.className = 'home-scene'
   scene.setAttribute('aria-hidden', 'true') // decorativo
 
-  // Tamaño de la escena: lilypad 20x12, frog 20x18 — apilados
   const SCALE = 5
   const SCENE_W = 20
   const SCENE_H = 12 + 18 + 2 // nenúfar + sapo + espacio
@@ -161,13 +182,9 @@ export function renderHome(container: HTMLElement): () => void {
   const instFrog = createSpriteInstance(frogIdle)
   const instPad = createSpriteInstance(lilypad)
 
-  // Animador
   const animator = new SpriteAnimator(() => {
     ctx.clearRect(0, 0, SCENE_W * SCALE, SCENE_H * SCALE)
-    // Fondo transparente — lo da el gradiente del section
-    // Nenúfar: parte baja de la escena
     drawSprite(ctx, instPad, 0, (SCENE_H - 12) * SCALE, SCALE)
-    // Sapo: encima del nenúfar, centrado
     drawSprite(ctx, instFrog, 0, (SCENE_H - 12 - 18 + 2) * SCALE, SCALE)
   })
 
@@ -177,7 +194,7 @@ export function renderHome(container: HTMLElement): () => void {
 
   scene.appendChild(canvas)
 
-  // ── Footer con botón ──
+  // ── Footer con botón y atajos PC ──
   const footer = document.createElement('footer')
   footer.className = 'home-footer'
 
@@ -186,7 +203,6 @@ export function renderHome(container: HTMLElement): () => void {
   btn.textContent = 'Entrar al jardín'
   btn.setAttribute('aria-label', 'Entrar al jardín — próximamente')
   btn.addEventListener('click', () => {
-    // Por ahora no hace nada (etapa 1)
     btn.textContent = '🐸 Ya viene...'
     setTimeout(() => { btn.textContent = 'Entrar al jardín' }, 1500)
   })
@@ -195,8 +211,13 @@ export function renderHome(container: HTMLElement): () => void {
   note.className = 'home-note'
   note.textContent = '💚 Solo vos, sin presiones'
 
+  const desktopHint = document.createElement('p')
+  desktopHint.className = 'desktop-hint'
+  desktopHint.textContent = 'Presioná Enter o Espacio para interactuar'
+
   footer.appendChild(btn)
   footer.appendChild(note)
+  footer.appendChild(desktopHint)
 
   // ── Ensamblar ──
   section.appendChild(header)
@@ -204,19 +225,25 @@ export function renderHome(container: HTMLElement): () => void {
   section.appendChild(footer)
   container.appendChild(section)
 
-  // Ignorar inline bg: lo maneja el gradiente CSS
-  // Dibujar primer frame de inmediato (accesibilidad: contenido sin JS no aplica a canvas)
+  // Dibujo inicial inmediato
   ctx.clearRect(0, 0, SCENE_W * SCALE, SCENE_H * SCALE)
   drawSprite(ctx, instPad, 0, (SCENE_H - 12) * SCALE, SCALE)
   drawSprite(ctx, instFrog, 0, (SCENE_H - 12 - 18 + 2) * SCALE, SCALE)
 
-  // Devolver cleanup
+  // Soporte de teclado para PC (Enter o Espacio)
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if ((e.key === 'Enter' || e.key === ' ') && document.activeElement !== btn) {
+      e.preventDefault()
+      btn.click()
+    }
+  }
+  window.addEventListener('keydown', handleKeyDown)
+
   return () => {
+    window.removeEventListener('keydown', handleKeyDown)
     animator.stop()
     style.remove()
   }
 }
 
-// Suprimir advertencia de import no usado
 void palette
-

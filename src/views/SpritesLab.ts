@@ -12,6 +12,7 @@ const SCALE_ACTUAL = 2
 
 /**
  * /sprites — Página de desarrollo para inspeccionar sprites.
+ * Adaptada para PC (cuadrícula responsiva) y celular (columna táctil).
  * Muestra cada sprite a x8 sobre fondo claro y oscuro,
  * y a tamaño real en un contenedor acotado de 360px.
  */
@@ -23,11 +24,12 @@ export function renderSpritesLab(container: HTMLElement): () => void {
     .sprites-lab {
       padding: var(--space-md);
       background-color: var(--color-menta);
-      min-height: 100dvh;
+      min-height: 100%;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       gap: var(--space-md);
-      box-sizing: border-box;
+      border-radius: var(--border-radius-md);
     }
 
     .lab-header {
@@ -57,11 +59,37 @@ export function renderSpritesLab(container: HTMLElement): () => void {
       min-height: var(--touch-target-min);
       min-width: var(--touch-target-min);
       cursor: pointer;
+      transition: transform var(--transition-fast), opacity var(--transition-fast);
+    }
+
+    @media (hover: hover) {
+      .back-btn:hover {
+        opacity: 0.92;
+        transform: translateY(-1px);
+      }
+    }
+
+    .back-btn:active {
+      transform: translateY(1px);
     }
 
     .back-btn:focus-visible {
       outline: 3px solid var(--color-acento);
       outline-offset: 3px;
+    }
+
+    .sprites-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+      width: 100%;
+    }
+
+    @media (min-width: 768px) {
+      .sprites-grid {
+        grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+        gap: var(--space-lg);
+      }
     }
 
     .sprite-card {
@@ -72,6 +100,7 @@ export function renderSpritesLab(container: HTMLElement): () => void {
       display: flex;
       flex-direction: column;
       gap: var(--space-sm);
+      box-sizing: border-box;
     }
 
     .sprite-card-title {
@@ -150,12 +179,15 @@ export function renderSpritesLab(container: HTMLElement): () => void {
 
   const backBtn = document.createElement('button')
   backBtn.className = 'back-btn'
-  backBtn.textContent = '← Volver'
+  backBtn.textContent = '← Volver (Esc)'
   backBtn.setAttribute('aria-label', 'Volver a la pantalla de inicio')
 
   header.appendChild(title)
   header.appendChild(backBtn)
   lab.appendChild(header)
+
+  const grid = document.createElement('div')
+  grid.className = 'sprites-grid'
 
   const renderFns: Array<() => void> = []
   const instances = ALL_SPRITES.map((def) => createSpriteInstance(def))
@@ -187,7 +219,7 @@ export function renderSpritesLab(container: HTMLElement): () => void {
     colLight.className = 'preview-col'
     const lblLight = document.createElement('span')
     lblLight.className = 'preview-label'
-    lblLight.textContent = `x${SCALE_PREVIEW} Fondo Claro`
+    lblLight.textContent = `x${SCALE_PREVIEW} Claro`
     const wrapLight = document.createElement('div')
     wrapLight.className = 'canvas-wrap light'
     const { canvas: cLight, ctx: ctxLight } = createPixelCanvas(w * SCALE_PREVIEW, h * SCALE_PREVIEW)
@@ -200,7 +232,7 @@ export function renderSpritesLab(container: HTMLElement): () => void {
     colDark.className = 'preview-col'
     const lblDark = document.createElement('span')
     lblDark.className = 'preview-label'
-    lblDark.textContent = `x${SCALE_PREVIEW} Fondo Oscuro`
+    lblDark.textContent = `x${SCALE_PREVIEW} Oscuro`
     const wrapDark = document.createElement('div')
     wrapDark.className = 'canvas-wrap dark'
     const { canvas: cDark, ctx: ctxDark } = createPixelCanvas(w * SCALE_PREVIEW, h * SCALE_PREVIEW)
@@ -213,7 +245,7 @@ export function renderSpritesLab(container: HTMLElement): () => void {
     colReal.className = 'preview-col'
     const lblReal = document.createElement('span')
     lblReal.className = 'preview-label'
-    lblReal.textContent = `Tamaño real (escala x${SCALE_ACTUAL}) en marco 360px`
+    lblReal.textContent = `Real (x${SCALE_ACTUAL}) en 360px`
     const realBox = document.createElement('div')
     realBox.className = 'real-size-box'
     const { canvas: cReal, ctx: ctxReal } = createPixelCanvas(w * SCALE_ACTUAL, h * SCALE_ACTUAL)
@@ -225,20 +257,17 @@ export function renderSpritesLab(container: HTMLElement): () => void {
     previews.appendChild(colDark)
     previews.appendChild(colReal)
     card.appendChild(previews)
-    lab.appendChild(card)
+    grid.appendChild(card)
 
     const drawAll = () => {
-      // Fondo claro
       ctxLight.fillStyle = palette.celesteAgua
       ctxLight.fillRect(0, 0, w * SCALE_PREVIEW, h * SCALE_PREVIEW)
       drawSprite(ctxLight, inst, 0, 0, SCALE_PREVIEW)
 
-      // Fondo oscuro
       ctxDark.fillStyle = palette.aguaProfunda
       ctxDark.fillRect(0, 0, w * SCALE_PREVIEW, h * SCALE_PREVIEW)
       drawSprite(ctxDark, inst, 0, 0, SCALE_PREVIEW)
 
-      // Tamaño real
       ctxReal.clearRect(0, 0, w * SCALE_ACTUAL, h * SCALE_ACTUAL)
       drawSprite(ctxReal, inst, 0, 0, SCALE_ACTUAL)
     }
@@ -246,6 +275,8 @@ export function renderSpritesLab(container: HTMLElement): () => void {
     renderFns.push(drawAll)
     drawAll()
   })
+
+  lab.appendChild(grid)
 
   const animator = new SpriteAnimator(() => {
     for (const render of renderFns) {
@@ -260,11 +291,23 @@ export function renderSpritesLab(container: HTMLElement): () => void {
 
   container.appendChild(lab)
 
-  backBtn.addEventListener('click', () => {
+  const handleBack = () => {
     backBtn.dispatchEvent(new CustomEvent('navigate-home', { bubbles: true }))
-  })
+  }
+
+  backBtn.addEventListener('click', handleBack)
+
+  // Atajo de teclado en PC: Escape para volver
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      handleBack()
+    }
+  }
+  window.addEventListener('keydown', handleKeyDown)
 
   return () => {
+    window.removeEventListener('keydown', handleKeyDown)
     animator.stop()
     style.remove()
   }

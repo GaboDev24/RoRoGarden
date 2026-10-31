@@ -57,12 +57,17 @@ Fuente de verdad: `src/palette/colors.ts` (TypeScript) y `src/palette/variables.
 
 ---
 
-## 📱 Layout y Responsive
+## 📱 Layout, Responsive y Adaptación PC
 
-- **Mobile-first:** diseño base para 360x640px en portrait.
+- **Mobile-first:** diseño base para 360x640px en portrait (la aplicación es ante todo una experiencia de bienestar para celular).
+- **Adaptación PC / Escritorio (`@media (min-width: 601px)`):**
+  - Fondo ambiental calmo y envolvente (`--color-agua-profunda` con gradiente sutil a `--color-tinta`).
+  - Marco centrado tipo dispositivo (`--desktop-frame-width: 400px`, altura acotada a `min(720px, calc(100dvh - 40px))`), borde en tinta y sombra suave (`--shadow-desktop-frame`), preservando intacta la ergonomía y ritmo vertical móvil.
+  - En la vista de desarrollo (`/sprites`), el contenedor se extiende (`--container-desktop-max: 1080px`) en una cuadrícula responsiva (`.sprites-grid`) para inspeccionar cómodamente los sprites en monitores amplios.
+  - Soporte de teclado (Enter / Espacio para interactuar, Escape para volver de `/sprites`) y estados de hover para mouse.
 - **Safe areas:** siempre respetar `env(safe-area-inset-*)`.
 - **Botones táctiles:** mínimo 48x48px de área de toque.
-- **Contenedor máximo:** 480px centrado.
+- **Contenedor máximo móvil:** 480px centrado.
 - **Sin `overflow-x: hidden` en `html`/`body`:** usar `overflow-x: clip`.
 - **Sin posiciones absolutas en píxeles fijos:** usar porcentajes, flex, grid.
 

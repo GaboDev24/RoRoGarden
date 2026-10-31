@@ -47,6 +47,11 @@ npm run build
 npm run preview
 ```
 
+## Experiencia en PC y Celular
+
+- **En celular:** Experiencia nativa PWA a pantalla completa con soporte táctil, safe areas y base 360x640px.
+- **En PC / Escritorio:** Marco centrado tipo jardín/dispositivo sobre fondo calmo de estanque nocturno, con soporte completo para mouse y teclado (`Enter` / `Espacio` para interactuar, `Escape` para volver desde `/sprites`). En `/sprites`, la interfaz aprovecha monitores anchos con una cuadrícula responsiva.
+
 ## Páginas
 
 | URL       | Descripción                                    |

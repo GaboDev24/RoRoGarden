@@ -24,6 +24,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* En pantallas de PC / escritorio: fondo ambiental tranquilo */
+@media (min-width: 601px) {
+  body {
+    background-color: var(--color-agua-profunda);
+    background-image: radial-gradient(
+      circle at 50% 30%,
+      var(--color-agua-profunda) 0%,
+      var(--color-tinta) 100%
+    );
+  }
+}
+
 /* Safe areas para notch y bordes redondeados */
 #app {
   min-height: 100dvh;
@@ -36,7 +48,15 @@ body {
   align-items: center;
 }
 
-/* Contenedor principal centrado y acotado */
+/* En PC: centrado vertical y horizontal */
+@media (min-width: 601px) {
+  #app {
+    justify-content: center;
+    padding: var(--space-md);
+  }
+}
+
+/* Contenedor principal centrado y acotado (mobile base) */
 .container {
   width: 100%;
   max-width: var(--container-max);
@@ -45,7 +65,35 @@ body {
   flex-direction: column;
 }
 
-/* ── Botones táctiles ── */
+/* Adaptación para PC: marco de dispositivo armónico y contenido centrado */
+@media (min-width: 601px) {
+  .container {
+    flex: initial;
+    width: 100%;
+    max-width: var(--desktop-frame-width);
+    height: min(720px, calc(100dvh - var(--space-xl)));
+    border: 3px solid var(--color-tinta);
+    border-radius: var(--border-radius-frame);
+    box-shadow: var(--shadow-desktop-frame);
+    overflow: hidden;
+    position: relative;
+    background-color: var(--color-menta);
+  }
+
+  /* Modo extendido para páginas de desarrollo y testing como /sprites */
+  .container.container-wide {
+    max-width: var(--container-desktop-max);
+    height: auto;
+    min-height: calc(100dvh - var(--space-xl));
+    border: none;
+    box-shadow: none;
+    border-radius: var(--border-radius-md);
+    overflow: visible;
+    background-color: transparent;
+  }
+}
+
+/* ── Botones táctiles y teclado ── */
 button {
   font-family: inherit;
   cursor: pointer;
@@ -75,4 +123,3 @@ canvas {
   font-family: var(--font-pixel);
   line-height: 1.6;
 }
-

@@ -4,7 +4,7 @@ import { renderSpritesLab } from './views/SpritesLab'
 
 /**
  * main.ts — Punto de entrada de RoRoGarden.
- * Maneja el enrutamiento básico: / y /sprites
+ * Maneja el enrutamiento básico: / y /sprites con adaptación para PC y celular.
  */
 
 const app = document.getElementById('app')!
@@ -20,29 +20,33 @@ function navigate(path: string): void {
   app.innerHTML = ''
 
   if (path === '/sprites') {
+    app.classList.add('container-wide')
     currentCleanup = renderSpritesLab(app)
-    // Escuchar el botón "volver" del lab
     app.addEventListener('navigate-home', () => navigate('/'), { once: true })
   } else {
+    app.classList.remove('container-wide')
     currentCleanup = renderHome(app)
-    // En la pantalla de inicio el link a /sprites solo en desarrollo
+
     if (import.meta.env.DEV) {
       const devLink = document.createElement('a')
       devLink.href = '/sprites'
       devLink.textContent = '🔬 Ver sprites (dev)'
       devLink.style.cssText = `
         position: fixed;
-        bottom: max(env(safe-area-inset-bottom, 0px), 8px);
-        right: 12px;
-        font-size: 10px;
-        font-family: monospace;
-        color: #6FA98A;
-        text-decoration: underline;
+        bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+        right: 16px;
+        font-size: var(--font-size-xs);
+        font-family: var(--font-pixel);
+        color: var(--color-tinta);
+        text-decoration: none;
         z-index: 100;
-        padding: 4px 8px;
-        background: rgba(246,239,201,0.85);
-        border-radius: 4px;
-        border: 1px solid #6FA98A;
+        padding: var(--space-xs) var(--space-sm);
+        background: var(--color-overlay-crema);
+        border-radius: var(--border-radius-sm);
+        border: 2px solid var(--color-musgo);
+        box-shadow: var(--shadow-sm);
+        cursor: pointer;
+        line-height: 1.6;
       `
       devLink.addEventListener('click', (e) => {
         e.preventDefault()
@@ -53,12 +57,11 @@ function navigate(path: string): void {
   }
 }
 
-// Enrutamiento por URL
-const path = window.location.pathname
-navigate(path === '/sprites' ? '/sprites' : '/')
+// Enrutamiento inicial
+const initialPath = window.location.pathname
+navigate(initialPath === '/sprites' ? '/sprites' : '/')
 
-// Manejar navegación del historial
+// Navegación con historial del navegador
 window.addEventListener('popstate', () => {
   navigate(window.location.pathname === '/sprites' ? '/sprites' : '/')
 })
-
