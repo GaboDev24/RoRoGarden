@@ -123,3 +123,11 @@ canvas {
   font-family: var(--font-pixel);
   line-height: 1.6;
 }
+
+/* ── Iconos vectoriales Font Awesome ── */
+.fa-icon {
+  display: inline-block;
+  vertical-align: -0.125em;
+  line-height: 1;
+  flex-shrink: 0;
+}

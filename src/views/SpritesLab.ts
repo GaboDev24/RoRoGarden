@@ -6,6 +6,7 @@ import {
   SpriteAnimator,
 } from '../sprites/renderer'
 import { palette } from '../palette/colors'
+import { createFaIcon } from '../icons'
 
 const SCALE_PREVIEW = 8
 const SCALE_ACTUAL = 2
@@ -175,7 +176,8 @@ export function renderSpritesLab(container: HTMLElement): () => void {
 
   const title = document.createElement('h1')
   title.className = 'lab-title'
-  title.textContent = '🐸 Sprites Lab (Dev)'
+  title.appendChild(createFaIcon('frog', { size: 14 }))
+  title.appendChild(document.createTextNode(' Sprites Lab (Dev)'))
 
   const backBtn = document.createElement('button')
   backBtn.className = 'back-btn'

@@ -1,4 +1,6 @@
 import { palette } from '../palette/colors'
+import { copy } from '../copy'
+import { createFaIcon } from '../icons'
 import {
   frogIdle,
   lilypad,
@@ -203,13 +205,22 @@ export function renderHome(container: HTMLElement): () => void {
   btn.textContent = 'Entrar al jardín'
   btn.setAttribute('aria-label', 'Entrar al jardín — próximamente')
   btn.addEventListener('click', () => {
-    btn.textContent = '🐸 Ya viene...'
-    setTimeout(() => { btn.textContent = 'Entrar al jardín' }, 1500)
+    btn.innerHTML = ''
+    const frog = createFaIcon('frog', { size: 14 })
+    frog.style.marginRight = 'var(--space-xs)'
+    btn.appendChild(frog)
+    btn.appendChild(document.createTextNode(` ${copy.home.loading}`))
+    setTimeout(() => {
+      window.location.hash = '#/jardin'
+    }, 350)
   })
 
   const note = document.createElement('p')
   note.className = 'home-note'
-  note.textContent = '💚 Solo vos, sin presiones'
+  const heartIcon = createFaIcon('heart', { size: 12 })
+  heartIcon.style.marginRight = 'var(--space-xs)'
+  note.appendChild(heartIcon)
+  note.appendChild(document.createTextNode(copy.home.peaceNote))
 
   const desktopHint = document.createElement('p')
   desktopHint.className = 'desktop-hint'

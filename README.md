@@ -35,6 +35,14 @@ npm run dev -- --host
 
 Luego desde el celular conectado a la misma red Wi-Fi, abrí la URL que aparece en la terminal (algo como `http://192.168.x.x:5173`).
 
+### Correr los tests
+
+```bash
+npm test
+```
+
+Ejecuta la suite de pruebas unitarias de persistencia, migración y ordenamiento con Vitest.
+
 ### Compilar para producción
 
 ```bash
@@ -52,29 +60,27 @@ npm run preview
 - **En celular:** Experiencia nativa PWA a pantalla completa con soporte táctil, safe areas y base 360x640px.
 - **En PC / Escritorio:** Marco centrado tipo jardín/dispositivo sobre fondo calmo de estanque nocturno, con soporte completo para mouse y teclado (`Enter` / `Espacio` para interactuar, `Escape` para volver desde `/sprites`). En `/sprites`, la interfaz aprovecha monitores anchos con una cuadrícula responsiva.
 
-## Páginas
+## Navegación y Rutas (Hash Router)
 
-| URL       | Descripción                                    |
-|-----------|------------------------------------------------|
-| `/`       | Pantalla de inicio (sapo animado + botón)      |
-| `/sprites`| Laboratorio de sprites (solo en desarrollo)    |
+| Ruta          | Pantalla | Descripción |
+|---------------|----------|-------------|
+| `#/`          | Portada  | Pantalla de inicio con sapo animado y botón "Entrar al jardín". |
+| `#/jardin`    | Jardín   | Escenario central con accesos a Check-in, Diario, Historial y Ajustes. |
+| `#/checkin`   | Check-in | Selector de 5 estados emocionales (32x32), nota opcional y botón Saltar. |
+| `#/diario`    | Diario   | Reflexión nocturna en 3 preguntas saltables y ritual de cierre con luna. |
+| `#/historial` | Mis días | Historial cronológico con vista, edición y borrado (sin culpas ni rachas). |
+| `#/ajustes`   | Ajustes  | Respaldo JSON (exportar/importar), borrado total y notas de privacidad. |
+| `#/sprites`   | Dev Lab  | Laboratorio de desarrollo para inspección de todos los sprites. |
 
-## Estructura del proyecto
+## Persistencia y Privacidad de Datos
 
-```
-src/
-  palette/
-    colors.ts        — Paleta tipada (fuente de verdad TS)
-    variables.css    — Variables CSS (fuente de verdad CSS)
-  sprites/
-    renderer.ts      — Motor de renderizado canvas pixel-art
-    definitions.ts   — Definiciones ASCII de los 5 sprites
-  views/
-    Home.ts          — Pantalla de inicio
-    SpritesLab.ts    — Laboratorio de sprites
-  main.ts            — Punto de entrada y enrutador
-  style.css          — Estilos globales
-```
+### ¿Dónde y cómo se guardan los datos?
+Se eligió **`localStorage`** por las siguientes razones de arquitectura:
+1. **Privacidad absoluta:** Los datos viven únicamente en el almacenamiento local del navegador del dispositivo. No hay servidores, APIs externas, analytics ni rastreo.
+2. **Ligereza y sincronía:** Evita dependencias de librerías asíncronas pesadas, garantizando una carga instantánea (cold start < 100ms) y rendimiento óptimo en celulares de gama media y baja.
+3. **Capacidad adecuada:** Una entrada diaria ocupa menos de 1 KB en JSON. La cuota estándar de 5 MB de `localStorage` permite más de 10 años ininterrumpidos de registros diarios.
+4. **Respaldo portable:** A través de la pantalla de Ajustes, la usuaria puede exportar e importar todos sus datos en un archivo JSON portable.
+5. **Esquema versionado y tolerancia a fallos:** Cada registro incluye el campo `version` (`CURRENT_SCHEMA_VERSION = 1`) y una función de migración extensible. Si el almacenamiento local es bloqueado por el navegador o modo incógnito, el sistema conmuta automáticamente a un búfer en memoria sin interrumpir la sesión de la usuaria.
 
 ## Sprites incluidos
 
@@ -82,18 +88,13 @@ src/
 - `frog-sleeping` — Sapo dormido
 - `mushroom` — Hongo con sombrero
 - `lilypad` — Nenúfar flotante
-- `moon-crescent` — Luna creciente con 3 estrellas parpadeantes
+- `moon-crescent` — Luna creciente con 3 estrellas titilantes
+- `frog-contenta` — Sapo contento (32x32, expresión alegre)
+- `frog-tranquila` — Sapo tranquilo (32x32, expresión serena)
+- `frog-cansada` — Sapo cansado (32x32, párpados caídos)
+- `frog-tensa` — Sapo tenso (32x32, ojos alerta, línea apretada)
+- `frog-triste` — Sapo triste (32x32, ojos caídos y lágrima suave)
 
-## Supuestos tomados (etapa 1)
+## Principios del proyecto
 
-1. Stack vanilla TypeScript sin frameworks (Vite + vite-plugin-pwa).
-2. Enrutamiento básico via `pathname` sin router externo.
-3. Los sprites son diseños pixel-art 100% originales; las referencias en `/referencias` se usaron solo para la paleta de ánimo (niebla, musgo, agua).
-4. Hallmark se usa en modo custom: paleta y estilo ya definidos; se ignoran reglas de fotos, landing y `theme.mjs deal` (motivos documentados en `design.md`).
-5. La fuente Press Start 2P se carga desde Google Fonts; en offline usa fallback monospace.
-6. El botón "Entrar al jardín" no tiene destino todavía (etapa 1).
-
-## Principios de diseño
-
-Ver `design.md` y `AGENTS.md` en la raíz del proyecto.
-
+Ver `AGENTS.md` y `design.md` en la raíz del proyecto.

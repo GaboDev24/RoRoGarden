@@ -66,15 +66,17 @@ La paleta, tipografía y reglas visuales están en `design.md`. Nunca hardcodear
 
 ---
 
-## 📁 Alcance de Etapa 1
+## 📁 Alcance de Etapa 2 (Completada)
 
-Solo se implementa:
-- Infraestructura PWA base
-- Sistema de paleta
-- Motor de sprites ASCII en canvas
-- 5 sprites originales
-- Página `/sprites` (desarrollo)
-- Pantalla de inicio
+Se implementó:
+- Router nativo por hash (`#/`, `#/jardin`, `#/checkin`, `#/diario`, `#/historial`, `#/ajustes`, `#/sprites`)
+- Módulo centralizado de textos `src/copy.ts` en español rioplatense
+- 5 sprites originales 32x32 de expresiones emocionales (contenta, tranquila, cansada, tensa, triste)
+- Pantalla Check-in con selector de estados, nota opcional y botón Saltar con igual peso
+- Pantalla Diario de cierre con 3 preguntas reflexivas saltables y ritual nocturno con luna
+- Módulo de almacenamiento local `src/storage` (localStorage) con esquema versionado (`version: 1`), tolerancia a fallos y tests en Vitest
+- Pantalla Mis Días (historial con ver, editar y borrar sin culpas ni métricas de rachas)
+- Pantalla de Ajustes con exportar/importar JSON y borrado total con doble confirmación
 
-**No implementar todavía:** check-in, diario, respiración, guardado de datos, notificaciones, ninguna mecánica de juego.
+**No implementar todavía:** respiración guiada, micro-desafíos, jardín que crece o cambia, resumen semanal, recordatorios o notificaciones, cuentas o sincronización, detección automática de estados de ánimo.
 

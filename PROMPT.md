@@ -61,4 +61,65 @@ Criterios de aceptación
 - Hay un README corto con cómo correrlo y cómo probarlo en el celular por la red local.
 - Al final, resumime qué hiciste y qué supuestos tomaste, en 5 líneas máximo (más las reglas de Hallmark que ignoraste, si hubo).
 
-No hagas todavía: check-in, diario, respiración, guardado de datos, notificaciones ni nada fuera de la lista.
+ETAPA 2: Check-in, diario y guardado local
+
+Contexto
+Seguimos el proyecto de la etapa 1. Leé primero AGENTS.md y design.md: sus principios (nunca castiga, todo opcional, privacidad total, voz rioplatense, paleta única) siguen vigentes y mandan sobre cualquier decisión de esta etapa. Usá las skills instaladas que apliquen (game-ui-ux, save-systems, hallmark). Hallmark se usa con las reglas de design.md (modo custom, sin fotos, sin secciones de landing, piso de calidad obligatorio, reglas ignoradas anotadas con motivo). Si algo es ambiguo, anotá tu supuesto en una línea y seguí.
+
+Objetivo
+Que la maestra pueda entrar al jardín, registrar cómo llega, escribir un diario mínimo al cierre del día y que todo quede guardado en su celular.
+
+Tareas (solo esto)
+
+1. Navegación mínima
+   - Routing simple por hash (#/jardin, #/checkin, #/diario, #/historial, #/ajustes), sin librerías de routing.
+   - "Entrar al jardín" de la pantalla de inicio lleva a #/jardin: un escenario placeholder con el sapo animado y tres botones grandes: "¿Cómo llegás hoy?", "Cerrar el día" y "Mis días". Un acceso discreto a Ajustes.
+   - Botón de volver visible y consistente. Nada obliga a pasar por ninguna pantalla.
+
+2. Check-in ("¿Cómo llegás hoy?")
+   - Cinco estados representados por el sapo con cinco expresiones distintas, dibujadas por vos como sprites originales 32x32: contenta, tranquila, cansada, tensa, triste. Cada uno con etiqueta de texto (no depender solo del dibujo ni del color).
+   - Un campo de texto corto y opcional ("¿Querés dejar algo escrito?").
+   - Botón "Saltar" siempre visible y con el mismo peso visual que "Guardar".
+   - Después de guardar, una frase cálida breve (sin consejos ni diagnóstico) y volver al jardín.
+
+3. Diario de cierre ("Cerrar el día")
+   - Mismo selector de estado que el check-in.
+   - Tres preguntas, una por pantalla, todas opcionales y saltables: "Algo lindo de hoy", "Algo que me pesó", "Algo que suelto".
+   - Al terminar, un pequeño ritual de salida: una animación corta de 2 a 3 segundos (el sapo se acomoda a dormir, aparece la luna) y una frase de cierre. Respetar prefers-reduced-motion (versión sin animación).
+
+4. Guardado local
+   - Módulo src/storage con una API simple: guardar, leer, listar, borrar un registro y borrar todo. Esquema versionado (campo "version") y función de migración vacía lista para usar.
+   - Persistencia en localStorage o IndexedDB (elegí uno y anotá por qué en el README). Un registro por tipo y fecha (fecha local del dispositivo), sin nombres de alumnos ni familias.
+   - Todo acceso al almacenamiento dentro de try/catch: si falla o está bloqueado, la app sigue funcionando y avisa con un mensaje amable.
+   - Tests básicos del módulo (Vitest): guardar y leer, listar ordenado por fecha, borrar, almacenamiento no disponible.
+
+5. Mis días (historial)
+   - Lista simple de registros pasados, de más nuevo a más viejo, con estado, fecha y texto.
+   - Poder ver, editar y borrar un registro individual, con confirmación al borrar.
+   - Si no hay registros, un estado vacío cálido ("Todavía no hay nada acá. Cuando quieras, este espacio te espera.").
+   - PROHIBIDO: contar días seguidos, mostrar "días sin registrar", porcentajes de cumplimiento o cualquier señal de culpa.
+
+6. Ajustes
+   - "Exportar mis datos" (descarga un archivo JSON) e "Importar" (con validación del archivo antes de pisar nada y confirmación). Esto es el respaldo: si se borran los datos del navegador, se pierden.
+   - "Borrar todo" con doble confirmación.
+   - Una nota breve y clara: "Tus datos viven solo en este celular. Nadie más los ve."
+
+7. Textos
+   - Todos los textos de la app en un único archivo src/copy.js, en español rioplatense (voseo), cálidos y breves, sin jerga de autoayuda ni diagnóstico. Ejemplos de tono: "¿Cómo llegás hoy?", "No hace falta que hoy tengas ganas.", "Dejalo acá, el jardín lo guarda."
+   - Que sea fácil de editar por alguien que no programa.
+
+8. Calidad
+   - Diseñar cada pantalla nueva con Hallmark según las reglas del proyecto y correr su revisión (audit/sloplint) sobre todas las pantallas de la app. Informar qué marcó y qué corregiste. Si no se puede correr la parte con navegador, decirlo y correr las estáticas.
+   - Accesibilidad: todos los controles con etiqueta, foco visible, navegable con teclado, botones de al menos 48px, contraste AA con la paleta del proyecto.
+   - Ningún color hardcodeado: todo sale de la paleta.
+
+Criterios de aceptación
+- Funciona offline (probar en modo avión) y los datos persisten al recargar y al cerrar y reabrir la app instalada.
+- Se ve y se usa bien a 360x640, con una sola mano.
+- Cada pantalla se puede saltar o abandonar sin perder nada ni recibir ningún reproche.
+- Exportar e importar funcionan de punta a punta con un archivo real.
+- Los tests pasan (npm test).
+- El README explica cómo correr, probar en el celular por red local y dónde y cómo se guardan los datos.
+- Resumen final de 5 líneas máximo: qué hiciste, supuestos tomados y reglas de Hallmark ignoradas (si hubo).
+
+No hagas todavía: respiración guiada, micro-desafíos, jardín que crece o cambia, resumen semanal, recordatorios o notificaciones, cuentas o sincronización, detección automática de estados de ánimo.

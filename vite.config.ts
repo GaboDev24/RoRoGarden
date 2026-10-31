@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
@@ -49,6 +50,9 @@ export default defineConfig({
   ],
   server: {
     host: true
+  },
+  test: {
+    environment: 'happy-dom',
+    include: ['tests/**/*.test.ts']
   }
 })
-

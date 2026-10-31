@@ -1,10 +1,17 @@
 import './style.css'
 import { renderHome } from './views/Home'
+import { renderJardin } from './views/Jardin'
+import { renderCheckin } from './views/Checkin'
+import { renderDiario } from './views/Diario'
+import { renderHistorial } from './views/Historial'
+import { renderAjustes } from './views/Ajustes'
 import { renderSpritesLab } from './views/SpritesLab'
+import { createFaIcon } from './icons'
 
 /**
- * main.ts — Punto de entrada de RoRoGarden.
- * Maneja el enrutamiento básico: / y /sprites con adaptación para PC y celular.
+ * main.ts — Enrutador por Hash simple y robusto de RoRoGarden.
+ * Sin dependencias pesadas de routing.
+ * Rutas soportadas: #/, #/jardin, #/checkin, #/diario, #/historial, #/ajustes, #/sprites
  */
 
 const app = document.getElementById('app')!
@@ -12,56 +19,91 @@ app.className = 'container'
 
 let currentCleanup: (() => void) | null = null
 
-function navigate(path: string): void {
+function getRoute(): string {
+  // Soporta tanto hash como pathname para /sprites en desarrollo
+  if (window.location.pathname === '/sprites') {
+    return '#/sprites'
+  }
+  const hash = window.location.hash || '#/'
+  return hash.split('?')[0]
+}
+
+function navigate(): void {
+  const route = getRoute()
+
   if (currentCleanup) {
     currentCleanup()
     currentCleanup = null
   }
   app.innerHTML = ''
 
-  if (path === '/sprites') {
+  if (route === '#/sprites') {
     app.classList.add('container-wide')
     currentCleanup = renderSpritesLab(app)
-    app.addEventListener('navigate-home', () => navigate('/'), { once: true })
-  } else {
-    app.classList.remove('container-wide')
-    currentCleanup = renderHome(app)
+    app.addEventListener('navigate-home', () => {
+      window.location.hash = '#/'
+    }, { once: true })
+    return
+  }
 
-    if (import.meta.env.DEV) {
-      const devLink = document.createElement('a')
-      devLink.href = '/sprites'
-      devLink.textContent = '🔬 Ver sprites (dev)'
-      devLink.style.cssText = `
-        position: fixed;
-        bottom: max(env(safe-area-inset-bottom, 0px), 12px);
-        right: 16px;
-        font-size: var(--font-size-xs);
-        font-family: var(--font-pixel);
-        color: var(--color-tinta);
-        text-decoration: none;
-        z-index: 100;
-        padding: var(--space-xs) var(--space-sm);
-        background: var(--color-overlay-crema);
-        border-radius: var(--border-radius-sm);
-        border: 2px solid var(--color-musgo);
-        box-shadow: var(--shadow-sm);
-        cursor: pointer;
-        line-height: 1.6;
-      `
-      devLink.addEventListener('click', (e) => {
-        e.preventDefault()
-        navigate('/sprites')
-      })
-      app.appendChild(devLink)
-    }
+  app.classList.remove('container-wide')
+
+  switch (route) {
+    case '#/jardin':
+      currentCleanup = renderJardin(app)
+      break
+    case '#/checkin':
+      currentCleanup = renderCheckin(app)
+      break
+    case '#/diario':
+      currentCleanup = renderDiario(app)
+      break
+    case '#/historial':
+      currentCleanup = renderHistorial(app)
+      break
+    case '#/ajustes':
+      currentCleanup = renderAjustes(app)
+      break
+    case '#/':
+    default:
+      currentCleanup = renderHome(app)
+      break
+  }
+
+  // Link discreto a /sprites en modo desarrollo
+  if (import.meta.env.DEV && route !== '#/sprites') {
+    const devLink = document.createElement('a')
+    devLink.href = '#/sprites'
+    devLink.appendChild(createFaIcon('flask', { size: 12 }))
+    devLink.appendChild(document.createTextNode(' Sprites (dev)'))
+    devLink.style.cssText = `
+      position: fixed;
+      bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+      right: 16px;
+      font-size: var(--font-size-xs);
+      font-family: var(--font-pixel);
+      color: var(--color-tinta);
+      text-decoration: none;
+      z-index: 100;
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--color-overlay-crema);
+      border-radius: var(--border-radius-sm);
+      border: 2px solid var(--color-musgo);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      line-height: 1.6;
+    `
+    devLink.addEventListener('click', (e) => {
+      e.preventDefault()
+      window.location.hash = '#/sprites'
+    })
+    app.appendChild(devLink)
   }
 }
 
-// Enrutamiento inicial
-const initialPath = window.location.pathname
-navigate(initialPath === '/sprites' ? '/sprites' : '/')
+// Escuchar cambios de hash y navegación atrás/adelante del historial
+window.addEventListener('hashchange', navigate)
+window.addEventListener('popstate', navigate)
 
-// Navegación con historial del navegador
-window.addEventListener('popstate', () => {
-  navigate(window.location.pathname === '/sprites' ? '/sprites' : '/')
-})
+// Inicializar ruta
+navigate()
