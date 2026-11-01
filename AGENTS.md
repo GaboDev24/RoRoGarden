@@ -79,5 +79,23 @@ Se implementó:
 - 4 nuevos sprites 32x32: sapo inhalando, sapo exhalando, sapo estirándose y sapo con manos en los oídos
 - Tests unitarios completos en Vitest para respiración, selección y persistencia (18 tests pasando)
 
-**No implementar todavía:** jardín que crece o cambia según las pausas, resumen semanal, recordatorios o notificaciones, cuentas o sincronización, funciones específicas para niños más allá del modo de visualización de la respiración.
+---
+
+## 📁 Alcance de Etapa 4 (Completada)
+
+Se implementó:
+- **Jardín vivo y dinámico (`src/world.ts`, `src/views/Jardin.ts`)**: Ciclo de hora del día (amanecer, día, atardecer, noche) y estaciones del año según hemisferio local, con paleta adaptada y noche con luna menguante y estrellas.
+- **Sapo protagonista empático**: Refleja el último estado de ánimo del check-in o diario; al tocarlo da un salto tierno con sonido y frase cálida; nombre personalizable opcional (sin insistir nunca si se salta).
+- **Catálogo de 26 decoraciones y visitantes originales (`src/catalog.ts`)**: 16x16 pixel art en 6 categorías (Visitantes, Hongos, Plantas, Agua, Cielo, Cositas).
+- **Lógica de grilla y colocación (`src/placement.ts`)**: Grilla 5x5 con validación pura de terreno (tierra, agua, cielo), celda central para el sapo, sin pérdida de objetos al desacomodar.
+- **Sistema de regalo diario (`src/gifts.ts`)**: Máximo 1 compañero/objeto por día tras registrar bienestar; modal acogedor dismissible sin presión ni listas de faltantes.
+- **Pantalla "Mi colección" (`src/views/MiColeccion.ts`, `#/micoleccion`)**: Vista organizada por categoría que muestra solo lo descubierto, sin siluetas vacías ni contadores que generen sensación de carencia.
+- **Modo "Acomodar" accesible**: Grilla táctil superpuesta en el canvas con selector inferior y tecla "Listo", respetando safe areas y estándares de toque (≥48px).
+- **Persistencia y migración de esquema v3 (`src/storage/`)**: Integración de `GardenState` en respaldo JSON, validación estricta de importación y función de reiniciar solo el jardín sin tocar registros de bienestar.
+- **Nuevos controles en Ajustes (`src/views/Ajustes.ts`)**: Toggle de animaciones del jardín, selector de hemisferio (Sur/Norte) y botón "Reiniciar solo el jardín" con doble confirmación.
+- **Optimizaciones de rendimiento y accesibilidad**: Bucle limitado a 30 FPS, pausa en pestaña oculta (`visibilitychange`), respeto a `prefers-reduced-motion` y WCAG AA.
+- **Tests unitarios completos en Vitest**: 34 tests pasando (world, catalog/placement, gifts, storage v3, breathing, pick). Build y sloplint limpios.
+
+**No implementar todavía:** resumen semanal, recordatorios o notificaciones push, cuentas o sincronización en la nube, opciones de compartir en redes sociales, compras o monedas dentro de la app.
+
 

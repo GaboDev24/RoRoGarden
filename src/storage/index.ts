@@ -5,10 +5,12 @@ import type {
   EntryType,
   DesafioPayload,
   RespiracionPayload,
+  GardenState,
 } from './types'
 
-export const CURRENT_SCHEMA_VERSION = 2
+export const CURRENT_SCHEMA_VERSION = 3
 const STORAGE_PREFIX = 'roro_entry_'
+const GARDEN_STATE_KEY = 'roro_garden_state'
 const BACKUP_APP_NAME = 'RoRoGarden'
 
 /**
@@ -23,6 +25,27 @@ export const MIGRATIONS: Record<number, (entry: any) => any> = {
       version: 2,
     }
   },
+  2: (entry) => {
+    // Migración de v2 a v3: actualiza versión a v3
+    return {
+      ...entry,
+      version: 3,
+    }
+  },
+}
+
+/**
+ * Estado del jardín por defecto (v3).
+ */
+export const DEFAULT_GARDEN_STATE: GardenState = {
+  version: 3,
+  obtainedItemIds: [],
+  placedDecorations: [],
+  frogName: null,
+  lastGiftDate: null,
+  gardenAnimationsEnabled: true,
+  hemisphere: 'sur',
+  frogNameAnswered: false,
 }
 
 /**
@@ -259,6 +282,7 @@ export function clearAllEntries(): StorageResult<boolean> {
       }
     }
     memoryFallback.clear()
+    clearGardenState()
     return { success: true, data: true }
   } catch (err) {
     return {
@@ -270,7 +294,81 @@ export function clearAllEntries(): StorageResult<boolean> {
 }
 
 /**
- * Exporta todos los registros en formato JSON para copia de seguridad.
+ * Carga el estado del jardín desde el almacenamiento local.
+ */
+export function loadGardenState(): GardenState {
+  try {
+    let raw: string | null = null
+    if (isStorageAvailable()) {
+      raw = window.localStorage.getItem(GARDEN_STATE_KEY)
+    } else {
+      raw = memoryFallback.get(GARDEN_STATE_KEY) ?? null
+    }
+
+    if (!raw) {
+      return { ...DEFAULT_GARDEN_STATE }
+    }
+
+    const parsed = JSON.parse(raw)
+    return {
+      ...DEFAULT_GARDEN_STATE,
+      ...parsed,
+      version: CURRENT_SCHEMA_VERSION,
+    }
+  } catch {
+    return { ...DEFAULT_GARDEN_STATE }
+  }
+}
+
+/**
+ * Guarda el estado del jardín en el almacenamiento local.
+ */
+export function saveGardenState(state: GardenState): StorageResult<GardenState> {
+  try {
+    const toSave: GardenState = {
+      ...state,
+      version: CURRENT_SCHEMA_VERSION,
+    }
+    const serialized = JSON.stringify(toSave)
+
+    if (isStorageAvailable()) {
+      window.localStorage.setItem(GARDEN_STATE_KEY, serialized)
+    } else {
+      memoryFallback.set(GARDEN_STATE_KEY, serialized)
+    }
+
+    return { success: true, data: toSave }
+  } catch {
+    return {
+      success: false,
+      error: 'No se pudo guardar el jardín.',
+    }
+  }
+}
+
+/**
+ * Borra solo el estado del jardín (decoraciones, colección, nombre del sapo).
+ * No borra registros de bienestar.
+ */
+export function clearGardenState(): StorageResult<boolean> {
+  try {
+    if (isStorageAvailable()) {
+      window.localStorage.removeItem(GARDEN_STATE_KEY)
+    } else {
+      memoryFallback.delete(GARDEN_STATE_KEY)
+    }
+    return { success: true, data: true }
+  } catch {
+    return {
+      success: false,
+      data: false,
+      error: 'No se pudo reiniciar el jardín.',
+    }
+  }
+}
+
+/**
+ * Exporta todos los registros y el estado del jardín en formato JSON.
  */
 export function exportBackup(): StorageResult<string> {
   try {
@@ -279,11 +377,14 @@ export function exportBackup(): StorageResult<string> {
       return { success: false, error: 'Error al reunir los registros para exportar.' }
     }
 
+    const gardenState = loadGardenState()
+
     const payload: BackupPayload = {
       app: BACKUP_APP_NAME,
       version: CURRENT_SCHEMA_VERSION,
       exportedAt: new Date().toISOString(),
       entries: listRes.data,
+      gardenState,
     }
 
     return { success: true, data: JSON.stringify(payload, null, 2) }
@@ -323,9 +424,29 @@ export function importBackup(jsonString: string): StorageResult<{ imported: numb
       }
     }
 
+    // Importar estado del jardín si viene en el respaldo y es válido
+    if (parsed.gardenState && typeof parsed.gardenState === 'object') {
+      const gs = parsed.gardenState
+      const isValidPlacements = !Array.isArray(gs.placedDecorations) || gs.placedDecorations.every(
+        (p: any) =>
+          typeof p.id === 'string' &&
+          typeof p.catalogId === 'string' &&
+          typeof p.x === 'number' && p.x >= 0 && p.x <= 4 &&
+          typeof p.y === 'number' && p.y >= 0 && p.y <= 4
+      )
+      const isValidFrogName = gs.frogName === null || (typeof gs.frogName === 'string' && gs.frogName.length <= 20)
+
+      if (isValidPlacements && isValidFrogName) {
+        saveGardenState({
+          ...DEFAULT_GARDEN_STATE,
+          ...gs,
+          version: CURRENT_SCHEMA_VERSION,
+        })
+      }
+    }
+
     return { success: true, data: { imported: count } }
   } catch (err) {
     return { success: false, error: 'Ocurrió un error inesperado al importar el respaldo.' }
   }
 }
-

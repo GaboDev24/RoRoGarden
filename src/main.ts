@@ -9,12 +9,13 @@ import { renderSpritesLab } from './views/SpritesLab'
 import { renderPausa } from './views/Pausa'
 import { renderDesafio } from './views/Desafio'
 import { renderRespirar } from './views/Respirar'
+import { renderMiColeccion } from './views/MiColeccion'
 import { createFaIcon } from './icons'
 
 /**
  * main.ts — Enrutador por Hash simple y robusto de RoRoGarden.
  * Sin dependencias pesadas de routing.
- * Rutas soportadas: #/, #/jardin, #/checkin, #/diario, #/historial, #/ajustes, #/sprites
+ * Rutas soportadas: #/, #/jardin, #/micoleccion, #/checkin, #/diario, #/historial, #/ajustes, #/sprites, #/pausa, #/respirar, #/desafio/:id
  */
 
 const app = document.getElementById('app')!
@@ -59,6 +60,9 @@ function navigate(): void {
     switch (route) {
       case '#/jardin':
         currentCleanup = renderJardin(app)
+        break
+      case '#/micoleccion':
+        currentCleanup = renderMiColeccion(app)
         break
       case '#/pausa':
         currentCleanup = renderPausa(app)

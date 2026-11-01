@@ -204,4 +204,95 @@ Criterios de aceptación
 - Los tests pasan (npm test).
 - Resumen final de 5 líneas máximo: qué hiciste, supuestos tomados y reglas de Hallmark ignoradas (si hubo).
 
-No hagas todavía: jardín que crece o cambia según las pausas, resumen semanal, recordatorios o notificaciones, cuentas o sincronización, funciones específicas para niños más allá del modo de visualización de la respiración.
+ETAPA 4: El jardín que cambia
+
+Contexto
+Seguimos el proyecto de las etapas 1, 2 y 3. Leé primero AGENTS.md y design.md: sus principios (nunca castiga, todo opcional, privacidad total, recompensas solo estéticas, voz rioplatense, paleta única) siguen vigentes y mandan sobre cualquier decisión de esta etapa. Usá las skills instaladas que apliquen (create-game-assets, game-ui-ux, game-feel, save-systems, audio-design, hallmark). Hallmark se usa con las reglas de design.md (modo custom, sin fotos, sin secciones de landing, piso de calidad obligatorio, reglas ignoradas anotadas con motivo). Si algo es ambiguo, anotá tu supuesto en una línea y seguí.
+
+Objetivo
+Que #/jardin deje de ser un escenario placeholder y sea un jardín vivo, bonito y calmo, que la maestra pueda decorar a su gusto y que se vaya llenando de visitantes y objetos como regalo por cuidarse. Nada se pierde, nada se marchita, nada se mide.
+
+Reglas de diseño de esta etapa (innegociables)
+- El jardín NUNCA empeora: no hay plantas que se secan, visitantes que se van, objetos que desaparecen ni escenas "tristes" por faltar. Todos los climas y momentos del día se ven lindos.
+- Sin contadores visibles: nada de "x de y objetos", siluetas de lo que falta, rachas, niveles, puntos ni porcentajes. Lo que no tiene no se muestra (evita la presión de completar la colección).
+- Sin mensajes sobre ausencias: nunca mencionar cuánto tiempo pasó ni "hace X días". Si vuelve tras un tiempo, el jardín la recibe igual, con una frase cálida y sin números.
+- Recompensas solo estéticas y predecibles: un regalo garantizado por día al hacer cualquier actividad. Nada de azar que enganche (cajas sorpresa, probabilidades, "casi lo conseguís").
+- Todo opcional: se puede usar la app entera sin tocar la decoración.
+
+Tareas (solo esto)
+
+1. Escena del jardín en #/jardin
+   - Escena en <canvas> en pixel art, por capas (cielo, fondo lejano de juncos y árboles, agua con nenúfares, primer plano con musgo y piedras), mobile-first 360x640. Los botones existentes ("¿Cómo llegás hoy?", "Cerrar el día", "Una pausa", "Mis días") quedan abajo, al alcance del pulgar, sin tapar la escena.
+   - Animaciones sutiles, de 2 a 4 cuadros y lentas: juncos que se mecen, ondas en el agua, parpadeo y salto ocasional de los sapos, luciérnagas de noche.
+   - Rendimiento: dibujar solo con la pestaña visible (requestAnimationFrame + visibilitychange), tope de 30 fps, sin trabajo cuando la escena no se ve. Pensado para celulares modestos.
+   - prefers-reduced-motion: escena estática. Más un interruptor propio en Ajustes: "Animaciones del jardín" (activado por defecto).
+
+2. Momento del día y estación (según el reloj del dispositivo)
+   - Función pura en src/world: dada una fecha y un hemisferio devuelve momento del día (amanecer, día, atardecer, noche) y estación. Por defecto hemisferio sur (Argentina), con selector en Ajustes.
+   - Cada momento y estación cambia la paleta de la escena (cielo, luz, hojas) usando SOLO colores de la paleta del proyecto. Si necesitás matices extra, agregalos a la paleta y a design.md, con el motivo, siempre en pastel y coherentes, y avisame en el resumen.
+   - La noche usa la luna y las estrellas de la etapa 1. Nada de oscuridad pesada: tiene que seguir siendo acogedora y legible.
+   - Pequeños detalles por estación (hojitas cayendo en otoño, flores en primavera, etc.). Máximo uno o dos por estación.
+
+3. Su sapo
+   - Un sapo protagonista que la representa. Su expresión sigue suavemente el último check-in del día (y es "tranquilo" por defecto). Todas las expresiones se ven simpáticas, ninguna "mala".
+   - Opcional: ponerle nombre (se guarda local, máx. 20 caracteres, validar el texto). Si no lo nombra, no se le pide de nuevo.
+   - Tocar al sapo hace una animación breve y tierna (y sonido solo si los sonidos están activados en Ajustes).
+
+4. Regalos
+   - Módulo src/gifts con lógica pura (sin DOM), generador de azar inyectable para poder testear.
+   - Se da como máximo un regalo por día calendario local, al guardar cualquier registro (check-in, cierre del día, desafío terminado o terminado antes, respiración). Saltar una pantalla no da ni quita nada. Terminar antes SÍ cuenta.
+   - Los regalos salen del catálogo de objetos que aún no tiene. Si ya los tiene todos, no se da más nada y no se anuncia (sin mensaje de "completaste todo").
+   - El regalo aparece con una animación corta y una frase cálida ("Alguien pasó a visitarte."). El mensaje aparece una sola vez y se puede cerrar o saltar.
+   - Nunca se muestra el límite diario ni un cartel de "ya recibiste hoy". Si hoy ya hubo regalo, simplemente no hay otro.
+   - Si vuelve tras días sin entrar: una frase de bienvenida cálida y SIN números, y el regalo del día como siempre.
+
+5. Catálogo de objetos y visitantes (src/catalog.js, editable por alguien que no programa)
+   - Entre 24 y 30 elementos originales en categorías: Visitantes (sapos de otros tonos de la paleta, sapos pequeños, una rana-lunita), Hongos (varios tamaños y sombreros, con el acento cálido usado con moderación), Plantas (juncos, flores acuáticas, helechos), Agua (nenúfares, ondas, una hojita-barco), Cielo (estrellas, nubes, luna con distintos brillos), Cositas (piedras, troncos, faroles de luciérnagas, un pequeño cartel sin texto).
+   - Cada elemento: id, categoría, nombre en voseo cálido, sprite, tamaño en celdas, si va en agua o en tierra.
+   - Sprites originales (16x16 y 32x32, hasta 6 colores más transparente, misma paleta, ojos grandes y tiernos en los animales). NO copiar personajes de las imágenes de referencia.
+   - Cada visitante tiene un comportamiento idle simple y distinto (parpadear, saltar, dormir, mirar la luna).
+
+6. Decorar ("Mi jardín")
+   - Modo decoración desde un botón discreto en el jardín: "Acomodar".
+   - Grilla de celdas de al menos 48 px de lado. Elegís un objeto de tu colección y tocás una celda para ponerlo; tocás un objeto puesto para moverlo o guardarlo. Funciona con toque simple (NO depender de arrastrar) y con teclado.
+   - Reglas de colocación en lógica pura (src/placement): dentro de la grilla, sin superponer, agua y tierra respetadas, una pieza puede guardarse y volver a la colección sin perderse.
+   - Botón "Listo" y salida siempre visibles. Cambios guardados automáticamente.
+   - Vista "Mi colección": lista de lo que tiene, con nombre, sin números ni totales, sin mostrar lo que no tiene.
+
+7. Guardado
+   - Estado del jardín en src/storage: objetos obtenidos, objetos colocados con posición, fecha del último regalo, nombre del sapo, preferencias. Subir la versión del esquema y escribir la migración desde la de la etapa 3 (con test).
+   - Incluirlo en exportar e importar. Validar el archivo importado: rechazar posiciones fuera de grilla, ids desconocidos o textos demasiado largos, sin pisar nada si algo falla.
+   - Ajustes nuevos: "Animaciones del jardín", "Hemisferio" y "Reiniciar solo el jardín" (doble confirmación, separado de "Borrar todo").
+   - Todo acceso al almacenamiento dentro de try/catch, como en las etapas anteriores.
+
+8. Textos
+   - Todos los textos nuevos en src/copy.js (voseo, cálidos, breves, sin jerga de autoayuda). Ejemplos de tono: "Alguien pasó a visitarte.", "El jardín te estaba esperando.", "Acomodalo como más te guste."
+
+9. Accesibilidad
+   - El canvas es decorativo: darle un aria-label corto y estático que describa la escena (por ejemplo: "Tu jardín, con un estanque, hongos y sapos") que se actualice cuando se agregan visitantes, sin leer cada animación.
+   - Todo el modo "Acomodar" operable con teclado y lector de pantalla (los objetos y celdas como controles reales con etiquetas, no solo dibujados en el canvas).
+   - Foco visible, contraste AA para los textos sobre la escena (usar fondos o sombras de la paleta si hace falta), botones de al menos 48px.
+
+10. Calidad
+   - Diseñar cada pantalla nueva con Hallmark según las reglas del proyecto y correr su revisión (audit/sloplint) sobre todas las pantallas. Informar qué marcó y qué corregiste. Si no se puede correr la parte con navegador, decirlo y correr las estáticas.
+   - Ningún color hardcodeado: todo sale de la paleta.
+   - Medir y reportar el rendimiento: fps en la escena animada y que no haya trabajo cuando la pestaña está oculta.
+
+Tests (Vitest)
+- Regalos: máximo uno por día local, sin repetir objetos ya obtenidos, determinista con azar inyectado, sin regalo cuando ya tiene todo, nunca da nada por saltar una pantalla.
+- Mundo: momento del día y estación correctos en ambos hemisferios y en los bordes de horario y de fecha.
+- Colocación: dentro de la grilla, sin superposiciones, agua y tierra, guardar y volver a colocar.
+- Migración del esquema de la etapa 3 a esta.
+- Importación: rechazo de archivos inválidos sin modificar los datos existentes.
+
+Criterios de aceptación
+- Se ve hermoso y calmo en los cuatro momentos del día y las cuatro estaciones, y ninguna combinación se ve "triste" ni "mala".
+- Se puede usar la app entera sin tocar la decoración ni "Acomodar".
+- No hay ningún contador, total, racha, silueta de lo faltante ni mención a la cantidad de días de ausencia en ninguna pantalla.
+- Funciona offline, y los objetos, posiciones y nombre persisten al recargar y al reabrir la app instalada.
+- La escena anda fluida a 360x640 en un celular modesto y no consume cuando la pestaña no está visible.
+- Exportar e importar funcionan de punta a punta con el jardín incluido.
+- Los tests pasan (npm test).
+- Resumen final de 5 líneas máximo: qué hiciste, supuestos tomados, colores agregados a la paleta (si hubo) y reglas de Hallmark ignoradas (si hubo).
+
+No hagas todavía: resumen semanal, recordatorios o notificaciones, sugerencia de apoyo profesional, cuentas o sincronización, compartir el jardín, compras o moneda, logros, estadísticas, nuevas reglas de desbloqueo más allá del regalo diario.

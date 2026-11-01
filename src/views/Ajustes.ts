@@ -12,11 +12,14 @@ import {
   clearAllEntries,
   isStorageAvailable,
   getLocalDateString,
+  loadGardenState,
+  saveGardenState,
+  clearGardenState,
 } from '../storage'
 
 /**
  * Vista #/ajustes — Ajustes y Respaldo
- * Exportación e importación de JSON, borrado total con doble confirmación.
+ * Exportación e importación de JSON, ajustes de jardín y sonido, borrado total con doble confirmación.
  */
 export function renderAjustes(container: HTMLElement): () => void {
   container.innerHTML = ''
@@ -248,6 +251,14 @@ export function renderAjustes(container: HTMLElement): () => void {
       margin-top: var(--space-xs);
       min-height: 18px;
     }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      cursor: pointer;
+      min-height: var(--touch-target-min);
+    }
   `
   document.head.appendChild(style)
 
@@ -338,7 +349,187 @@ export function renderAjustes(container: HTMLElement): () => void {
   audioGroup.appendChild(soundLabelRow)
   audioGroup.appendChild(vibLabelRow)
 
-  // ── 1. Exportar datos ──
+  // ── 1. Jardín ──
+  const gardenState = loadGardenState()
+  const gardenGroup = document.createElement('div')
+  gardenGroup.className = 'settings-group'
+
+  const gardenTitle = document.createElement('h2')
+  gardenTitle.className = 'group-title'
+  gardenTitle.textContent = copy.ajustes.gardenTitle
+
+  // Toggle animaciones del jardín
+  const gardenAnimRow = document.createElement('label')
+  gardenAnimRow.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); cursor: pointer; min-height: var(--touch-target-min);'
+  const gardenAnimText = document.createElement('span')
+  gardenAnimText.className = 'group-desc'
+  gardenAnimText.style.margin = '0'
+  gardenAnimText.textContent = copy.ajustes.gardenAnimationsLabel
+  const gardenAnimCheck = document.createElement('input')
+  gardenAnimCheck.type = 'checkbox'
+  gardenAnimCheck.style.cssText = 'width: 22px; height: 22px; accent-color: var(--color-bosque); cursor: pointer;'
+  gardenAnimCheck.checked = gardenState.gardenAnimationsEnabled
+  gardenAnimCheck.addEventListener('change', () => {
+    const current = loadGardenState()
+    saveGardenState({ ...current, gardenAnimationsEnabled: gardenAnimCheck.checked })
+    showToast('Animaciones del jardín actualizadas')
+  })
+  gardenAnimRow.appendChild(gardenAnimText)
+  gardenAnimRow.appendChild(gardenAnimCheck)
+
+  // Selector de hemisferio
+  const hemiContainer = document.createElement('div')
+  hemiContainer.style.cssText = 'display: flex; flex-direction: column; gap: 4px; margin-top: var(--space-xs);'
+  const hemiTitle = document.createElement('span')
+  hemiTitle.className = 'group-desc'
+  hemiTitle.style.fontWeight = 'bold'
+  hemiTitle.textContent = copy.ajustes.hemisphereLabel
+
+  const hemiSurRow = document.createElement('label')
+  hemiSurRow.className = 'radio-option'
+  const hemiSurRadio = document.createElement('input')
+  hemiSurRadio.type = 'radio'
+  hemiSurRadio.name = 'hemisphere'
+  hemiSurRadio.value = 'sur'
+  hemiSurRadio.checked = gardenState.hemisphere === 'sur'
+  hemiSurRadio.style.cssText = 'accent-color: var(--color-bosque);'
+  const hemiSurText = document.createElement('span')
+  hemiSurText.className = 'group-desc'
+  hemiSurText.style.margin = '0'
+  hemiSurText.textContent = copy.ajustes.hemisphereSur
+  hemiSurRow.appendChild(hemiSurRadio)
+  hemiSurRow.appendChild(hemiSurText)
+
+  const hemiNorteRow = document.createElement('label')
+  hemiNorteRow.className = 'radio-option'
+  const hemiNorteRadio = document.createElement('input')
+  hemiNorteRadio.type = 'radio'
+  hemiNorteRadio.name = 'hemisphere'
+  hemiNorteRadio.value = 'norte'
+  hemiNorteRadio.checked = gardenState.hemisphere === 'norte'
+  hemiNorteRadio.style.cssText = 'accent-color: var(--color-bosque);'
+  const hemiNorteText = document.createElement('span')
+  hemiNorteText.className = 'group-desc'
+  hemiNorteText.style.margin = '0'
+  hemiNorteText.textContent = copy.ajustes.hemisphereNorte
+  hemiNorteRow.appendChild(hemiNorteRadio)
+  hemiNorteRow.appendChild(hemiNorteText)
+
+  const onHemiChange = (val: 'sur' | 'norte') => {
+    const current = loadGardenState()
+    saveGardenState({ ...current, hemisphere: val })
+    showToast('Hemisferio actualizado')
+  }
+  hemiSurRadio.addEventListener('change', () => { if (hemiSurRadio.checked) onHemiChange('sur') })
+  hemiNorteRadio.addEventListener('change', () => { if (hemiNorteRadio.checked) onHemiChange('norte') })
+
+  hemiContainer.appendChild(hemiTitle)
+  hemiContainer.appendChild(hemiSurRow)
+  hemiContainer.appendChild(hemiNorteRow)
+
+  // Botón reiniciar solo jardín (con doble confirmación)
+  const resetGardenTitle = document.createElement('h3')
+  resetGardenTitle.className = 'group-title'
+  resetGardenTitle.style.marginTop = 'var(--space-sm)'
+  resetGardenTitle.textContent = copy.ajustes.resetGardenTitle
+
+  const resetGardenDesc = document.createElement('p')
+  resetGardenDesc.className = 'group-desc'
+  resetGardenDesc.textContent = copy.ajustes.resetGardenDesc
+
+  const resetGardenBtn = document.createElement('button')
+  resetGardenBtn.className = 'btn-action btn-danger'
+  resetGardenBtn.textContent = copy.ajustes.resetGardenBtn
+  resetGardenBtn.addEventListener('click', () => {
+    // Primera confirmación
+    const overlay = document.createElement('div')
+    overlay.className = 'modal-overlay'
+
+    const modal = document.createElement('div')
+    modal.className = 'modal-card'
+
+    const mTitle = document.createElement('h3')
+    mTitle.className = 'modal-title'
+    mTitle.textContent = copy.ajustes.resetGardenTitle
+
+    const mDesc = document.createElement('p')
+    mDesc.className = 'modal-desc'
+    mDesc.textContent = copy.ajustes.resetGardenConfirm1
+
+    const mActions = document.createElement('div')
+    mActions.className = 'modal-actions'
+
+    const cancelBtn = document.createElement('button')
+    cancelBtn.className = 'btn-action btn-secondary'
+    cancelBtn.textContent = copy.app.cancel
+    cancelBtn.addEventListener('click', () => overlay.remove())
+
+    const proceedBtn = document.createElement('button')
+    proceedBtn.className = 'btn-action btn-danger'
+    proceedBtn.textContent = 'Sí, continuar'
+    proceedBtn.addEventListener('click', () => {
+      overlay.remove()
+
+      // Segunda confirmación
+      const overlay2 = document.createElement('div')
+      overlay2.className = 'modal-overlay'
+
+      const modal2 = document.createElement('div')
+      modal2.className = 'modal-card'
+
+      const mTitle2 = document.createElement('h3')
+      mTitle2.className = 'modal-title'
+      mTitle2.textContent = 'Confirmación final'
+
+      const mDesc2 = document.createElement('p')
+      mDesc2.className = 'modal-desc'
+      mDesc2.textContent = copy.ajustes.resetGardenConfirm2
+
+      const mActions2 = document.createElement('div')
+      mActions2.className = 'modal-actions'
+
+      const cancelBtn2 = document.createElement('button')
+      cancelBtn2.className = 'btn-action btn-secondary'
+      cancelBtn2.textContent = copy.app.cancel
+      cancelBtn2.addEventListener('click', () => overlay2.remove())
+
+      const finalResetBtn = document.createElement('button')
+      finalResetBtn.className = 'btn-action btn-danger'
+      finalResetBtn.textContent = 'Reiniciar jardín'
+      finalResetBtn.addEventListener('click', () => {
+        clearGardenState()
+        overlay2.remove()
+        showToast(copy.ajustes.resetGardenSuccess)
+      })
+
+      mActions2.appendChild(cancelBtn2)
+      mActions2.appendChild(finalResetBtn)
+      modal2.appendChild(mTitle2)
+      modal2.appendChild(mDesc2)
+      modal2.appendChild(mActions2)
+      overlay2.appendChild(modal2)
+      section.appendChild(overlay2)
+      finalResetBtn.focus()
+    })
+
+    mActions.appendChild(cancelBtn)
+    mActions.appendChild(proceedBtn)
+    modal.appendChild(mTitle)
+    modal.appendChild(mDesc)
+    modal.appendChild(mActions)
+    overlay.appendChild(modal)
+    section.appendChild(overlay)
+    proceedBtn.focus()
+  })
+
+  gardenGroup.appendChild(gardenTitle)
+  gardenGroup.appendChild(gardenAnimRow)
+  gardenGroup.appendChild(hemiContainer)
+  gardenGroup.appendChild(resetGardenTitle)
+  gardenGroup.appendChild(resetGardenDesc)
+  gardenGroup.appendChild(resetGardenBtn)
+
+  // ── 2. Exportar datos ──
   const exportGroup = document.createElement('div')
   exportGroup.className = 'settings-group'
 
@@ -376,7 +567,7 @@ export function renderAjustes(container: HTMLElement): () => void {
   exportGroup.appendChild(expDesc)
   exportGroup.appendChild(expBtn)
 
-  // ── 2. Importar datos ──
+  // ── 3. Importar datos ──
   const importGroup = document.createElement('div')
   importGroup.className = 'settings-group'
 
@@ -466,7 +657,7 @@ export function renderAjustes(container: HTMLElement): () => void {
   importGroup.appendChild(impBtn)
   importGroup.appendChild(fileInput)
 
-  // ── 3. Borrar todo (doble confirmación) ──
+  // ── 4. Borrar todo (doble confirmación) ──
   const clearGroup = document.createElement('div')
   clearGroup.className = 'settings-group'
 
@@ -573,6 +764,7 @@ export function renderAjustes(container: HTMLElement): () => void {
   section.appendChild(privacyCard)
   if (storageWarning) section.appendChild(storageWarning)
   section.appendChild(audioGroup)
+  section.appendChild(gardenGroup)
   section.appendChild(exportGroup)
   section.appendChild(importGroup)
   section.appendChild(clearGroup)
@@ -583,4 +775,3 @@ export function renderAjustes(container: HTMLElement): () => void {
     style.remove()
   }
 }
-
