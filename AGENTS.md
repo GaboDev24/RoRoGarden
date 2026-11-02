@@ -96,6 +96,21 @@ Se implementó:
 - **Optimizaciones de rendimiento y accesibilidad**: Bucle limitado a 30 FPS, pausa en pestaña oculta (`visibilitychange`), respeto a `prefers-reduced-motion` y WCAG AA.
 - **Tests unitarios completos en Vitest**: 34 tests pasando (world, catalog/placement, gifts, storage v3, breathing, pick). Build y sloplint limpios.
 
-**No implementar todavía:** resumen semanal, recordatorios o notificaciones push, cuentas o sincronización en la nube, opciones de compartir en redes sociales, compras o monedas dentro de la app.
+---
+
+## 📁 Alcance de Etapa 5 (Completada)
+
+Se implementó:
+- **"Mi semana" a demanda (`src/week.ts`, `src/views/Semana.ts`, `#/semana`)**: Tira de días con el sapo según el último estado de ánimo de cada día o una hojita neutra en días sin registro (sin marcar faltas ni culpas); sección "Lo lindo de la semana" con hasta 3 citas textuales de "Algo lindo de hoy" (sin amplificar lo que pesó ni lo que se soltó); sección "Lo que cuidaste" con categorías de pausas sin números; navegación semanal hacia el pasado (bloqueada al futuro); frase de cierre rotativa y enlace discreto a ayuda.
+- **Detección suave de patrones (`src/patterns.ts`)**: Función pura opcional (apagada por defecto); umbral conservador (mínimo 5 registros para ese día, >= 70% en esa tendencia); máximo una observación a la vez; prioridad a lo positivo; enlace directo a sugerir una pausa en ese día; botón para descartar definitivamente.
+- **Recordatorios suaves y exportación iCalendar (`src/reminders.ts`, `src/views/Recordatorios.ts`, `#/recordatorios`)**: Configuración de 3 momentos ("Antes de entrar", "Pausa de media jornada", "Cierre del día") apagados por defecto; banner suave descartable dentro de la app (una sola vez por día/momento); generación de archivo universal `.ics` (RFC 5545) con CRLF, plegado a 75 octetos, UID determinista y hora flotante; instrucciones claras para Android e iOS; modo "Descansar de los avisos".
+- **Pantalla de Ayuda y recursos verificados (`src/resources.ts`, `src/views/Ayuda.ts`, `#/ayuda`)**: Siempre accesible sin condiciones desde Ajustes y el pie de Mi Semana; líneas oficiales verificadas de Argentina (911, Línea 135 CAS CABA/GBA, CAS Nacional y 0800) con enlaces `tel:`; mensaje cálido recordando que la app no reemplaza a un profesional; sección abierta para recursos de zona.
+- **Aviso de apoyo sensible (`src/support.ts`, `src/views/Jardin.ts`)**: Tarjeta discreta no alarmante en el jardín cuando se cumplen condiciones estrictas (6 días difíciles en una ventana de 10 días y los últimos 3 días difíciles; "cansada" no cuenta); enfriamiento de 21 días; botón "No mostrar más este aviso"; sin role="alert" ni lenguaje clínico.
+- **Persistencia y migración de esquema v4 (`src/storage/`)**: Integración completa en `GardenState`, migraciones v1/v2/v3 -> v4, validación estricta de importación (rechazo sin tocar datos si hay horas, días o recordatorios corruptos).
+- **Ajustes y accesibilidad (`src/views/Ajustes.ts`)**: Toggles para "Mi semana en el jardín", días a mostrar (L-V / Toda la semana), patrones suaves, acceso a recordatorios, "Descansar de los avisos", sugerencias de apoyo y ayuda.
+- **Tests unitarios completos en Vitest**: 61 tests pasando en 10 suites de prueba (incluyendo lectura de `.ics` con `node-ical`). Build y sloplint limpios.
+
+**No implementar todavía:** cuentas o sincronización en la nube, Web Push o servidores remotos, análisis NLP de texto libre, estadísticas o gráficos de tendencia, exportar informes clínicos, chat o IA dentro de la app.
+
 
 

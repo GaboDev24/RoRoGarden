@@ -10,6 +10,9 @@ import { renderPausa } from './views/Pausa'
 import { renderDesafio } from './views/Desafio'
 import { renderRespirar } from './views/Respirar'
 import { renderMiColeccion } from './views/MiColeccion'
+import { renderSemana } from './views/Semana'
+import { renderRecordatorios } from './views/Recordatorios'
+import { renderAyuda } from './views/Ayuda'
 import { createFaIcon } from './icons'
 
 /**
@@ -63,6 +66,15 @@ function navigate(): void {
         break
       case '#/micoleccion':
         currentCleanup = renderMiColeccion(app)
+        break
+      case '#/semana':
+        currentCleanup = renderSemana(app)
+        break
+      case '#/recordatorios':
+        currentCleanup = renderRecordatorios(app)
+        break
+      case '#/ayuda':
+        currentCleanup = renderAyuda(app)
         break
       case '#/pausa':
         currentCleanup = renderPausa(app)

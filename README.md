@@ -65,8 +65,12 @@ npm run preview
 | Ruta             | Pantalla  | Descripción |
 |------------------|-----------|-------------|
 | `#/`             | Portada   | Pantalla de inicio con sapo animado y botón "Entrar al jardín". |
-| `#/jardin`       | Jardín    | Escenario central con accesos a Una pausa, Check-in, Diario, Historial y Ajustes. |
-| `#/pausa`        | Una pausa | Selección de 3 micro-desafíos al azar, filtro por categoría y acceso a respiración. |
+| `#/jardin`       | Jardín        | Escenario central vivo con sapo según mood, ciclo día/noche y decoraciones. |
+| `#/micoleccion`  | Mi colección  | Galería de visitantes y objetos descubiertos (sin contadores de falta). |
+| `#/semana`       | Mi semana     | Resumen a demanda: tira de días con sapo u hojita neutra, lo lindo y pausas. |
+| `#/recordatorios`| Recordatorios | Configuración de 3 momentos suaves y exportación a calendario (.ics). |
+| `#/ayuda`        | Ayuda         | Teléfonos oficiales y líneas gratuitas de escucha (135, 911). |
+| `#/pausa`        | Una pausa     | Selección de 3 micro-desafíos al azar, filtro por categoría y acceso a respiración. |
 | `#/desafio/:id`  | Desafío   | Ejecución paso a paso con temporizador continuo, Wake Lock y sapo animado. |
 | `#/respirar`     | Respirar  | Respiración guiada en 3 patrones, 3 duraciones y modo "Con mi sala". |
 | `#/checkin`      | Check-in  | Selector de 5 estados emocionales (32x32), nota opcional y botón Saltar. |
@@ -86,6 +90,20 @@ Se eligió **`localStorage`** por las siguientes razones de arquitectura:
 5. **Esquema versionado y tolerancia a fallos:** Cada registro incluye el campo `version` (`CURRENT_SCHEMA_VERSION = 2`) y una cadena de migraciones automáticas (`1 -> 2`). Si el almacenamiento local es bloqueado por el navegador o modo incógnito, el sistema conmuta automáticamente a un búfer en memoria sin interrumpir la sesión de la usuaria.
 6. **Registros silenciosos sin métricas (Etapa 3):** Al concluir o abandonar un micro-desafío o una sesión de respiración, se guarda en silencio un registro mínimo con fines de uso futuro. **No se muestra ningún contador, racha, porcentaje ni 'veces que hiciste X'**, preservando la promesa de una experiencia 100% libre de culpa o presión de logro. Estos registros se incluyen íntegramente en la exportación e importación de Ajustes.
 7. **Sonido y vibración opcionales:** La campana y la vibración háptica se sintetizan procedimentalmente mediante Web Audio API y la API de vibración, permanecen apagadas por defecto y pueden activarse desde Ajustes.
+
+## Recordatorios, Notificaciones y Privacidad (Etapa 5)
+
+### ¿Por qué no usamos Web Push ni notificaciones remotas?
+1. **Privacidad total sin backend:** RoRoGarden no tiene servidores ni cuentas de usuario. Implementar Web Push exigiría un servidor remoto que almacene suscripciones y datos de presencia, violando el principio innegociable de privacidad absoluta en el dispositivo.
+2. **Limitaciones de las PWAs sin servidor:** Los navegadores móviles modernos suspenden o terminan los Service Workers inactivos y no permiten temporizadores precisos en segundo plano (`setTimeout` o alarmas de larga duración se pausan cuando el celular apaga la pantalla). Las APIs de notificaciones locales puras del navegador (como la Notification API) no pueden despertarse a sí mismas si la PWA está cerrada o en segundo plano prolongado.
+3. **La solución elegida: doble mecanismo respetuoso y autónomo:**
+   - **En la app:** Banner suave y descartable si la usuaria está usando la aplicación en el momento configurado (sin sonido intrusivo).
+   - **En el dispositivo (offline):** Exportación de un archivo de calendario universal `.ics` (RFC 5545) que se importa en un toque en Google Calendar (Android) o Calendario de Apple (iOS). De esta forma, el reloj nativo del sistema operativo gestiona las alarmas con confiabilidad del 100%, incluso con la app cerrada y sin gastar batería ni transmitir ningún dato.
+
+### Ruta futura recomendada (Capacitor)
+Para una eventual distribución en tiendas (Google Play Store o Apple App Store) con notificaciones locales periódicas sin servidor, la arquitectura técnica recomendada es empaquetar la aplicación con **Capacitor** (`@capacitor/local-notifications`). Este plugin interactúa directamente con el `AlarmManager` de Android y el `UNUserNotificationCenter` de iOS, permitiendo programar avisos locales recurrentes directamente desde el cliente sin requerir ningún servidor remoto.
+
+---
 
 ## Sprites incluidos
 

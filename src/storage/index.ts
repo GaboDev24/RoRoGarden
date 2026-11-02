@@ -7,8 +7,9 @@ import type {
   RespiracionPayload,
   GardenState,
 } from './types'
+import { DEFAULT_REMINDERS, validateReminderConfig } from '../reminders'
 
-export const CURRENT_SCHEMA_VERSION = 3
+export const CURRENT_SCHEMA_VERSION = 4
 const STORAGE_PREFIX = 'roro_entry_'
 const GARDEN_STATE_KEY = 'roro_garden_state'
 const BACKUP_APP_NAME = 'RoRoGarden'
@@ -32,13 +33,20 @@ export const MIGRATIONS: Record<number, (entry: any) => any> = {
       version: 3,
     }
   },
+  3: (entry) => {
+    // Migración de v3 a v4: actualiza versión a v4
+    return {
+      ...entry,
+      version: 4,
+    }
+  },
 }
 
 /**
- * Estado del jardín por defecto (v3).
+ * Estado del jardín por defecto (v4).
  */
 export const DEFAULT_GARDEN_STATE: GardenState = {
-  version: 3,
+  version: 4,
   obtainedItemIds: [],
   placedDecorations: [],
   frogName: null,
@@ -46,6 +54,17 @@ export const DEFAULT_GARDEN_STATE: GardenState = {
   gardenAnimationsEnabled: true,
   hemisphere: 'sur',
   frogNameAnswered: false,
+
+  // Campos Etapa 5
+  showWeekInGarden: true,
+  weekShowWeekend: false,
+  showPatterns: false,
+  dismissedPatternIds: [],
+  reminders: DEFAULT_REMINDERS,
+  vacationMode: false,
+  lastSupportNoticeDate: null,
+  supportSuggestionsEnabled: true,
+  dismissedInAppReminders: {},
 }
 
 /**
@@ -394,7 +413,7 @@ export function exportBackup(): StorageResult<string> {
 }
 
 /**
- * Importa un archivo de respaldo JSON previamente validado.
+ * Importa un archivo de respaldo JSON previamente validado de forma estricta.
  */
 export function importBackup(jsonString: string): StorageResult<{ imported: number }> {
   try {
@@ -413,36 +432,85 @@ export function importBackup(jsonString: string): StorageResult<{ imported: numb
       }
     }
 
-    let count = 0
+    // Validar todas las entradas antes de escribir cualquier cambio
     for (const item of parsed.entries) {
-      if (item && item.id && item.type && item.date && item.data) {
-        const migrated = migrateEntry(item)
-        const saveRes = saveEntry(migrated)
-        if (saveRes.success) {
-          count++
+      if (!item || typeof item !== 'object' || !item.id || !item.type || !item.date || !item.data) {
+        return {
+          success: false,
+          error: 'El archivo contiene registros incompletos o corruptos. No se modificaron tus datos.',
         }
       }
     }
 
-    // Importar estado del jardín si viene en el respaldo y es válido
+    // Validar estado del jardín si viene incluido
+    let validGardenState: GardenState | null = null
     if (parsed.gardenState && typeof parsed.gardenState === 'object') {
       const gs = parsed.gardenState
-      const isValidPlacements = !Array.isArray(gs.placedDecorations) || gs.placedDecorations.every(
-        (p: any) =>
-          typeof p.id === 'string' &&
-          typeof p.catalogId === 'string' &&
-          typeof p.x === 'number' && p.x >= 0 && p.x <= 4 &&
-          typeof p.y === 'number' && p.y >= 0 && p.y <= 4
-      )
-      const isValidFrogName = gs.frogName === null || (typeof gs.frogName === 'string' && gs.frogName.length <= 20)
 
-      if (isValidPlacements && isValidFrogName) {
-        saveGardenState({
-          ...DEFAULT_GARDEN_STATE,
-          ...gs,
-          version: CURRENT_SCHEMA_VERSION,
-        })
+      const isValidPlacements =
+        !Array.isArray(gs.placedDecorations) ||
+        gs.placedDecorations.every(
+          (p: any) =>
+            typeof p.id === 'string' &&
+            typeof p.catalogId === 'string' &&
+            typeof p.x === 'number' &&
+            p.x >= 0 &&
+            p.x <= 4 &&
+            typeof p.y === 'number' &&
+            p.y >= 0 &&
+            p.y <= 4
+        )
+
+      const isValidFrogName =
+        gs.frogName === null || (typeof gs.frogName === 'string' && gs.frogName.length <= 20)
+
+      const isValidReminders =
+        !('reminders' in gs) ||
+        (Array.isArray(gs.reminders) && gs.reminders.every((r: any) => validateReminderConfig(r)))
+
+      const isValidBooleans =
+        (gs.weekShowWeekend === undefined || typeof gs.weekShowWeekend === 'boolean') &&
+        (gs.showWeekInGarden === undefined || typeof gs.showWeekInGarden === 'boolean') &&
+        (gs.showPatterns === undefined || typeof gs.showPatterns === 'boolean') &&
+        (gs.vacationMode === undefined || typeof gs.vacationMode === 'boolean') &&
+        (gs.supportSuggestionsEnabled === undefined || typeof gs.supportSuggestionsEnabled === 'boolean')
+
+      const isValidDismissedPatterns =
+        gs.dismissedPatternIds === undefined ||
+        (Array.isArray(gs.dismissedPatternIds) && gs.dismissedPatternIds.every((id: any) => typeof id === 'string'))
+
+      if (
+        !isValidPlacements ||
+        !isValidFrogName ||
+        !isValidReminders ||
+        !isValidBooleans ||
+        !isValidDismissedPatterns
+      ) {
+        return {
+          success: false,
+          error: 'La configuración del jardín en el archivo no es válida. No se modificaron tus datos.',
+        }
       }
+
+      validGardenState = {
+        ...DEFAULT_GARDEN_STATE,
+        ...gs,
+        version: CURRENT_SCHEMA_VERSION,
+      }
+    }
+
+    // Si todo es válido, realizar la importación
+    let count = 0
+    for (const item of parsed.entries) {
+      const migrated = migrateEntry(item)
+      const saveRes = saveEntry(migrated)
+      if (saveRes.success) {
+        count++
+      }
+    }
+
+    if (validGardenState) {
+      saveGardenState(validGardenState)
     }
 
     return { success: true, data: { imported: count } }

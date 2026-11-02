@@ -585,6 +585,31 @@ export const frogEars: SpriteDefinition = {
   ]],
 }
 
+// ─────────────────────────────────────────────────────────────
+// HOJITA NEUTRA — día sin registro en Mi Semana (16x16)
+// ─────────────────────────────────────────────────────────────
+export const neutralLeaf: SpriteDefinition = {
+  id: 'neutral-leaf',
+  frames: [[
+    '.......TT.......',
+    '......TVVT......',
+    '.....TVVVVT.....',
+    '....TVVMMVVT....',
+    '...TVVMMMMVVT...',
+    '..TVVMMTTMMVVT..',
+    '..TVVMMTTMMVVT..',
+    '.TVVVMMTTMMVVVT.',
+    '.TVVVMMTTMMVVVT.',
+    '..TVVMMTTMMVVT..',
+    '..TVVMMTTMMVVT..',
+    '...TVVMMMMVVT...',
+    '....TVVMMVVT....',
+    '.....TVTTT......',
+    '......TT........',
+    '................',
+  ]],
+}
+
 // Exportar todos juntos para conveniencia (desarrollo y tests)
 export const ALL_SPRITES: SpriteDefinition[] = [
   frogIdle,
@@ -602,4 +627,5 @@ export const ALL_SPRITES: SpriteDefinition[] = [
   frogBreathing,
   frogStretching,
   frogEars,
+  neutralLeaf,
 ]

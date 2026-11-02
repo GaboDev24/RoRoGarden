@@ -121,7 +121,7 @@ describe('Módulo de Almacenamiento Local (RoRoGarden)', () => {
     expect(listEntries().data?.length).toBe(0)
   })
 
-  it('exporta e importa copias de respaldo en JSON preservando el estado del jardín', () => {
+  it('exporta e importa copias de respaldo en JSON preservando el estado del jardín y etapa 5', () => {
     const entry: GardenEntry = {
       id: 'checkin_2026-10-31',
       version: CURRENT_SCHEMA_VERSION,
@@ -134,7 +134,8 @@ describe('Módulo de Almacenamiento Local (RoRoGarden)', () => {
     saveEntry(entry)
 
     saveGardenState({
-      version: 3,
+      ...loadGardenState(),
+      version: 4,
       obtainedItemIds: ['vis-sapito-menta'],
       placedDecorations: [{ id: 'inst-1', catalogId: 'vis-sapito-menta', x: 2, y: 1 }],
       frogName: 'Pepe',
@@ -142,6 +143,10 @@ describe('Módulo de Almacenamiento Local (RoRoGarden)', () => {
       gardenAnimationsEnabled: true,
       hemisphere: 'sur',
       frogNameAnswered: true,
+      weekShowWeekend: true,
+      showPatterns: true,
+      dismissedPatternIds: ['pattern-1'],
+      vacationMode: true,
     })
 
     const expRes = exportBackup()
@@ -149,13 +154,14 @@ describe('Módulo de Almacenamiento Local (RoRoGarden)', () => {
     expect(typeof expRes.data).toBe('string')
     expect(expRes.data).toContain('vis-sapito-menta')
     expect(expRes.data).toContain('Pepe')
+    expect(expRes.data).toContain('pattern-1')
 
     // Limpiar base
     clearAllEntries()
     expect(listEntries().data?.length).toBe(0)
     expect(loadGardenState().frogName).toBeNull()
 
-    // Importar JSON inválido
+    // Importar JSON inválido (no debe tocar los datos)
     const invalidImport = importBackup('{ "foo": "bar" }')
     expect(invalidImport.success).toBe(false)
 
@@ -169,9 +175,62 @@ describe('Módulo de Almacenamiento Local (RoRoGarden)', () => {
     expect(restoredGarden.frogName).toBe('Pepe')
     expect(restoredGarden.obtainedItemIds).toContain('vis-sapito-menta')
     expect(restoredGarden.placedDecorations.length).toBe(1)
+    expect(restoredGarden.weekShowWeekend).toBe(true)
+    expect(restoredGarden.showPatterns).toBe(true)
+    expect(restoredGarden.vacationMode).toBe(true)
+    expect(restoredGarden.dismissedPatternIds).toContain('pattern-1')
   })
 
-  it('migra automáticamente registros de versión 1 y 2 a versión 3', () => {
+  it('rechaza archivos de respaldo corruptos o con recordatorios inválidos sin modificar datos', () => {
+    // Guardar un estado válido
+    saveEntry({
+      id: 'checkin_2026-11-01',
+      version: 4,
+      type: 'checkin',
+      date: '2026-11-01',
+      createdAt: '2026-11-01T10:00:00Z',
+      updatedAt: '2026-11-01T10:00:00Z',
+      data: { mood: 'tranquila' },
+    })
+
+    // Respaldo corrupto con hora inválida '99:99'
+    const corruptBackup = JSON.stringify({
+      app: 'RoRoGarden',
+      version: 4,
+      exportedAt: '2026-11-01T10:00:00Z',
+      entries: [
+        {
+          id: 'checkin_2026-11-02',
+          version: 4,
+          type: 'checkin',
+          date: '2026-11-02',
+          data: { mood: 'contenta' },
+        },
+      ],
+      gardenState: {
+        reminders: [
+          {
+            id: 'antes-de-entrar',
+            name: 'Test',
+            enabled: true,
+            time: '99:99', // HORA INVÁLIDA
+            days: [1],
+            eventText: 'Pausa',
+          },
+        ],
+      },
+    })
+
+    const importRes = importBackup(corruptBackup)
+    expect(importRes.success).toBe(false)
+    expect(importRes.error).toContain('no es válida')
+
+    // El registro existente sigue intacto y el nuevo NO se importó
+    expect(getEntry('checkin_2026-11-01').data).not.toBeNull()
+    expect(getEntry('checkin_2026-11-02').data).toBeNull()
+  })
+
+  it('migra automáticamente registros de versiones 1, 2 y 3 a versión 4', () => {
     const rawV1 = {
       id: 'checkin_2026-10-20',
       version: 1,
@@ -181,12 +240,9 @@ describe('Módulo de Almacenamiento Local (RoRoGarden)', () => {
       updatedAt: '2026-10-20T10:00:00.000Z',
       data: { mood: 'tranquila' },
     }
-
     const migratedV1 = migrateEntry(rawV1)
     expect(migratedV1.version).toBe(CURRENT_SCHEMA_VERSION)
-    expect(migratedV1.version).toBe(3)
-    expect(migratedV1.id).toBe('checkin_2026-10-20')
-    expect(migratedV1.data).toEqual({ mood: 'tranquila' })
+    expect(migratedV1.version).toBe(4)
 
     const rawV2 = {
       id: 'checkin_2026-10-25',
@@ -197,30 +253,48 @@ describe('Módulo de Almacenamiento Local (RoRoGarden)', () => {
       updatedAt: '2026-10-25T10:00:00.000Z',
       data: { mood: 'contenta' },
     }
-
     const migratedV2 = migrateEntry(rawV2)
-    expect(migratedV2.version).toBe(3)
+    expect(migratedV2.version).toBe(4)
+
+    const rawV3 = {
+      id: 'checkin_2026-10-28',
+      version: 3,
+      type: 'checkin',
+      date: '2026-10-28',
+      createdAt: '2026-10-28T10:00:00.000Z',
+      updatedAt: '2026-10-28T10:00:00.000Z',
+      data: { mood: 'cansada' },
+    }
+    const migratedV3 = migrateEntry(rawV3)
+    expect(migratedV3.version).toBe(4)
   })
 
-  it('administra el estado del jardín: cargar defaults, guardar y reiniciar', () => {
-    // Defaults iniciales
+  it('administra el estado del jardín: cargar defaults v4, guardar y reiniciar', () => {
     const initial = loadGardenState()
-    expect(initial.version).toBe(3)
+    expect(initial.version).toBe(4)
     expect(initial.obtainedItemIds).toEqual([])
     expect(initial.placedDecorations).toEqual([])
     expect(initial.frogName).toBeNull()
     expect(initial.hemisphere).toBe('sur')
+    expect(initial.showWeekInGarden).toBe(true)
+    expect(initial.weekShowWeekend).toBe(false)
+    expect(initial.showPatterns).toBe(false)
+    expect(initial.vacationMode).toBe(false)
+    expect(initial.supportSuggestionsEnabled).toBe(true)
+    expect(initial.reminders.length).toBe(3)
 
     // Guardar cambios
     saveGardenState({
       ...initial,
       frogName: 'Croaky',
       obtainedItemIds: ['item-1'],
+      vacationMode: true,
     })
 
     const updated = loadGardenState()
     expect(updated.frogName).toBe('Croaky')
     expect(updated.obtainedItemIds).toEqual(['item-1'])
+    expect(updated.vacationMode).toBe(true)
 
     // Reiniciar solo jardín
     clearGardenState()
@@ -229,7 +303,7 @@ describe('Módulo de Almacenamiento Local (RoRoGarden)', () => {
     expect(cleared.obtainedItemIds).toEqual([])
   })
 
-  it('guarda registros de pausas (desafíos y respiración) en silencio y los incluye en exportación', () => {
+  it('guarda registros de pausas en silencio y los incluye en exportación', () => {
     const resDesafio = savePauseEntry('desafio', {
       challengeId: 'cuerpo-cuello',
       title: 'Estirar cuello y hombros',
@@ -240,7 +314,7 @@ describe('Módulo de Almacenamiento Local (RoRoGarden)', () => {
 
     expect(resDesafio.success).toBe(true)
     expect(resDesafio.data?.type).toBe('desafio')
-    expect(resDesafio.data?.version).toBe(3)
+    expect(resDesafio.data?.version).toBe(4)
 
     const resResp = savePauseEntry('respiracion', {
       pattern: 'suave',

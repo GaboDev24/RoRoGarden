@@ -529,6 +529,182 @@ export function renderAjustes(container: HTMLElement): () => void {
   gardenGroup.appendChild(resetGardenDesc)
   gardenGroup.appendChild(resetGardenBtn)
 
+  // ── 1.5. Mi semana y recordatorios (Etapa 5) ──
+  const weekGroup = document.createElement('div')
+  weekGroup.className = 'settings-group'
+
+  const weekTitle = document.createElement('h2')
+  weekTitle.className = 'group-title'
+  weekTitle.textContent = copy.ajustes.weekTitle
+
+  // Toggle mostrar Mi semana en el jardín
+  const showWeekRow = document.createElement('label')
+  showWeekRow.style.cssText =
+    'display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); cursor: pointer; min-height: var(--touch-target-min);'
+  const showWeekText = document.createElement('span')
+  showWeekText.className = 'group-desc'
+  showWeekText.style.margin = '0'
+  showWeekText.textContent = copy.ajustes.showWeekLabel
+  const showWeekCheck = document.createElement('input')
+  showWeekCheck.type = 'checkbox'
+  showWeekCheck.style.cssText =
+    'width: 22px; height: 22px; accent-color: var(--color-bosque); cursor: pointer;'
+  showWeekCheck.checked = gardenState.showWeekInGarden
+  showWeekCheck.addEventListener('change', () => {
+    const current = loadGardenState()
+    saveGardenState({ ...current, showWeekInGarden: showWeekCheck.checked })
+    showToast('Preferencia de Mi semana actualizada')
+  })
+  showWeekRow.appendChild(showWeekText)
+  showWeekRow.appendChild(showWeekCheck)
+
+  // Selector de días en Mi semana (Lun-Vie vs Toda la semana)
+  const weekDaysContainer = document.createElement('div')
+  weekDaysContainer.style.cssText =
+    'display: flex; flex-direction: column; gap: 4px; margin-top: var(--space-xs);'
+  const weekDaysTitle = document.createElement('span')
+  weekDaysTitle.className = 'group-desc'
+  weekDaysTitle.style.fontWeight = 'bold'
+  weekDaysTitle.textContent = copy.ajustes.weekDaysLabel
+
+  const weekDaysWorkRow = document.createElement('label')
+  weekDaysWorkRow.className = 'radio-option'
+  const weekDaysWorkRadio = document.createElement('input')
+  weekDaysWorkRadio.type = 'radio'
+  weekDaysWorkRadio.name = 'weekDays'
+  weekDaysWorkRadio.value = 'work'
+  weekDaysWorkRadio.checked = !gardenState.weekShowWeekend
+  weekDaysWorkRadio.style.cssText = 'accent-color: var(--color-bosque);'
+  const weekDaysWorkText = document.createElement('span')
+  weekDaysWorkText.className = 'group-desc'
+  weekDaysWorkText.style.margin = '0'
+  weekDaysWorkText.textContent = copy.ajustes.weekDaysWork
+  weekDaysWorkRow.appendChild(weekDaysWorkRadio)
+  weekDaysWorkRow.appendChild(weekDaysWorkText)
+
+  const weekDaysAllRow = document.createElement('label')
+  weekDaysAllRow.className = 'radio-option'
+  const weekDaysAllRadio = document.createElement('input')
+  weekDaysAllRadio.type = 'radio'
+  weekDaysAllRadio.name = 'weekDays'
+  weekDaysAllRadio.value = 'all'
+  weekDaysAllRadio.checked = gardenState.weekShowWeekend
+  weekDaysAllRadio.style.cssText = 'accent-color: var(--color-bosque);'
+  const weekDaysAllText = document.createElement('span')
+  weekDaysAllText.className = 'group-desc'
+  weekDaysAllText.style.margin = '0'
+  weekDaysAllText.textContent = copy.ajustes.weekDaysAll
+  weekDaysAllRow.appendChild(weekDaysAllRadio)
+  weekDaysAllRow.appendChild(weekDaysAllText)
+
+  const onWeekDaysChange = (includeWeekend: boolean) => {
+    const current = loadGardenState()
+    saveGardenState({ ...current, weekShowWeekend: includeWeekend })
+    showToast('Días de Mi semana actualizados')
+  }
+  weekDaysWorkRadio.addEventListener('change', () => {
+    if (weekDaysWorkRadio.checked) onWeekDaysChange(false)
+  })
+  weekDaysAllRadio.addEventListener('change', () => {
+    if (weekDaysAllRadio.checked) onWeekDaysChange(true)
+  })
+
+  weekDaysContainer.appendChild(weekDaysTitle)
+  weekDaysContainer.appendChild(weekDaysWorkRow)
+  weekDaysContainer.appendChild(weekDaysAllRow)
+
+  // Toggle patrones suaves
+  const patternsRow = document.createElement('label')
+  patternsRow.style.cssText =
+    'display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); cursor: pointer; min-height: var(--touch-target-min);'
+  const patternsText = document.createElement('span')
+  patternsText.className = 'group-desc'
+  patternsText.style.margin = '0'
+  patternsText.textContent = copy.ajustes.showPatternsLabel
+  const patternsCheck = document.createElement('input')
+  patternsCheck.type = 'checkbox'
+  patternsCheck.style.cssText =
+    'width: 22px; height: 22px; accent-color: var(--color-bosque); cursor: pointer;'
+  patternsCheck.checked = gardenState.showPatterns
+  patternsCheck.addEventListener('change', () => {
+    const current = loadGardenState()
+    saveGardenState({ ...current, showPatterns: patternsCheck.checked })
+    showToast('Preferencia de patrones actualizada')
+  })
+  patternsRow.appendChild(patternsText)
+  patternsRow.appendChild(patternsCheck)
+
+  // Botón a Recordatorios
+  const remindersBtn = document.createElement('button')
+  remindersBtn.type = 'button'
+  remindersBtn.className = 'btn-action btn-secondary'
+  remindersBtn.style.marginTop = 'var(--space-xs)'
+  remindersBtn.textContent = copy.ajustes.remindersBtn
+  remindersBtn.addEventListener('click', () => {
+    window.location.hash = '#/recordatorios'
+  })
+
+  // Toggle Descansar de los avisos
+  const vacRow = document.createElement('label')
+  vacRow.style.cssText =
+    'display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); cursor: pointer; min-height: var(--touch-target-min); margin-top: var(--space-xs);'
+  const vacText = document.createElement('span')
+  vacText.className = 'group-desc'
+  vacText.style.margin = '0'
+  vacText.textContent = copy.ajustes.vacationLabel
+  const vacCheck = document.createElement('input')
+  vacCheck.type = 'checkbox'
+  vacCheck.style.cssText =
+    'width: 22px; height: 22px; accent-color: var(--color-bosque); cursor: pointer;'
+  vacCheck.checked = gardenState.vacationMode
+  vacCheck.addEventListener('change', () => {
+    const current = loadGardenState()
+    saveGardenState({ ...current, vacationMode: vacCheck.checked })
+    showToast('Preferencia de avisos actualizada')
+  })
+  vacRow.appendChild(vacText)
+  vacRow.appendChild(vacCheck)
+
+  // Toggle Sugerencias de apoyo
+  const supportRow = document.createElement('label')
+  supportRow.style.cssText =
+    'display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); cursor: pointer; min-height: var(--touch-target-min);'
+  const supportText = document.createElement('span')
+  supportText.className = 'group-desc'
+  supportText.style.margin = '0'
+  supportText.textContent = copy.ajustes.supportSuggestionsLabel
+  const supportCheck = document.createElement('input')
+  supportCheck.type = 'checkbox'
+  supportCheck.style.cssText =
+    'width: 22px; height: 22px; accent-color: var(--color-bosque); cursor: pointer;'
+  supportCheck.checked = gardenState.supportSuggestionsEnabled
+  supportCheck.addEventListener('change', () => {
+    const current = loadGardenState()
+    saveGardenState({ ...current, supportSuggestionsEnabled: supportCheck.checked })
+    showToast('Preferencia de apoyo actualizada')
+  })
+  supportRow.appendChild(supportText)
+  supportRow.appendChild(supportCheck)
+
+  // Botón a Ayuda
+  const helpBtn = document.createElement('button')
+  helpBtn.type = 'button'
+  helpBtn.className = 'btn-action btn-secondary'
+  helpBtn.style.marginTop = 'var(--space-xs)'
+  helpBtn.textContent = copy.ajustes.helpBtn
+  helpBtn.addEventListener('click', () => {
+    window.location.hash = '#/ayuda'
+  })
+
+  weekGroup.appendChild(weekTitle)
+  weekGroup.appendChild(showWeekRow)
+  weekGroup.appendChild(weekDaysContainer)
+  weekGroup.appendChild(patternsRow)
+  weekGroup.appendChild(remindersBtn)
+  weekGroup.appendChild(vacRow)
+  weekGroup.appendChild(supportRow)
+  weekGroup.appendChild(helpBtn)
+
   // ── 2. Exportar datos ──
   const exportGroup = document.createElement('div')
   exportGroup.className = 'settings-group'
@@ -765,6 +941,7 @@ export function renderAjustes(container: HTMLElement): () => void {
   if (storageWarning) section.appendChild(storageWarning)
   section.appendChild(audioGroup)
   section.appendChild(gardenGroup)
+  section.appendChild(weekGroup)
   section.appendChild(exportGroup)
   section.appendChild(importGroup)
   section.appendChild(clearGroup)

@@ -295,4 +295,103 @@ Criterios de aceptación
 - Los tests pasan (npm test).
 - Resumen final de 5 líneas máximo: qué hiciste, supuestos tomados, colores agregados a la paleta (si hubo) y reglas de Hallmark ignoradas (si hubo).
 
-No hagas todavía: resumen semanal, recordatorios o notificaciones, sugerencia de apoyo profesional, cuentas o sincronización, compartir el jardín, compras o moneda, logros, estadísticas, nuevas reglas de desbloqueo más allá del regalo diario.
+ETAPA 5: Mi semana, recordatorios suaves y ayuda siempre disponible
+
+Contexto
+Seguimos el proyecto de las etapas 1 a 4. Leé primero AGENTS.md y design.md: sus principios (nunca castiga, todo opcional, privacidad total, sin contadores ni métricas de culpa, voz rioplatense, paleta única) siguen vigentes y mandan sobre cualquier decisión de esta etapa. Usá las skills instaladas que apliquen (game-ui-ux, save-systems, hallmark). Hallmark se usa con las reglas de design.md (modo custom, sin fotos, sin secciones de landing, piso de calidad obligatorio, reglas ignoradas anotadas con motivo). Si algo es ambiguo, anotá tu supuesto en una línea y seguí.
+
+Objetivo
+Tres cosas: (1) "Mi semana", un resumen amable y a demanda de lo que la usuaria registró; (2) recordatorios suaves que ella elige y controla; (3) una pantalla de ayuda siempre disponible y un aviso de apoyo muy cuidadoso para cuando los días vengan pesados. Esta etapa es sensible: ante cualquier duda, elegí la opción más discreta, más suave y menos intrusiva.
+
+Reglas innegociables de esta etapa
+- Mi semana es a demanda. Nunca hay avisos del tipo "tu resumen está listo", ni insignias, ni números en íconos.
+- Los días sin registro se ven como un espacio neutro (una hojita), nunca como "faltó". No existe ningún texto, color ni ícono que marque ausencias.
+- Prohibido: rachas, porcentajes visibles, totales, puntajes, gráficos de tendencia, comparaciones entre semanas, "mejor/peor semana".
+- Lo difícil no se amplifica: el resumen abre con lo lindo. Lo que "pesó" o "solté" NO aparece en el resumen (solo en el detalle del día en "Mis días").
+- NUNCA analizar el texto libre del diario (nada de palabras clave, sentimiento, NLP). Todo se calcula solo con los estados que ella eligió explícitamente.
+- Sin diagnósticos ni etiquetas ("depresión", "ansiedad", "burnout"). El lenguaje siempre es "lo que anotaste", nunca "estás".
+- Prohibido en cualquier texto: "no entraste", "te extrañamos", "hace X días", "no te olvides", "tenés que", "detectamos", "alerta".
+- Todo lo nuevo es opcional y se puede desactivar.
+
+Tareas (solo esto)
+
+1. Mi semana (#/semana)
+   - Botón discreto en #/jardin. Se puede ocultar con el interruptor "Mi semana" en Ajustes (activado por defecto).
+   - Semana de lunes a domingo según fecha local del dispositivo. Ajuste "Días a mostrar": "Lunes a viernes" (por defecto) o "Toda la semana". Flechas para ver semanas anteriores; no se puede navegar al futuro. Semana sin registros: estado vacío cálido, sin mencionar la ausencia.
+   - Tira de días: por cada día, el sapo con la expresión del último registro de estado de ese día (sprite reducido de la etapa 2) y su etiqueta de texto accesible ("Lunes: tranquila"). Sin registro: una hojita neutra con la etiqueta del día ("Martes"), sin ninguna marca de falta.
+   - Sección "Lo lindo de la semana": hasta 3 respuestas de "Algo lindo de hoy", en sus propias palabras, sin editar, con el día. Las más recientes primero. Si no hay, la sección no aparece y no se dice nada.
+   - Sección "Lo que cuidaste": solo los NOMBRES de las categorías de pausas que hizo esa semana (Voz, Cuerpo, Silencio, Respiración, Ánimo), sin cantidades. Si no hizo ninguna, la sección no aparece.
+   - Frase de cierre rotativa de src/copy.js, cálida, sin ninguna referencia a cantidades ni a lo que falta.
+   - Lógica pura en src/week (sin DOM): armar la semana, agrupar registros por día, seleccionar lo lindo. Ojo con cambios de mes y de año.
+
+2. Patrones (opcional, apagado por defecto)
+   - Ajuste "Mostrar cosas que noté" (desactivado). Si se activa, aparece en Mi semana una sección "Cosas que noté" con como máximo UNA observación a la vez.
+   - Lógica pura en src/patterns. Solo mira día de la semana vs. estados de check-in. Umbrales conservadores en constantes comentadas: un día de la semana con al menos 5 registros y al menos el 70% en estados "cansada" o "tensa" o "triste" genera una observación suave; con "contenta" o "tranquila" genera una positiva. Si hay positiva y difícil a la vez, mostrar primero la positiva. Los porcentajes se calculan por dentro y NO se muestran.
+   - Redacción siempre como "lo que anotaste", sin causalidad ni predicción. Ejemplo: "Parece que los jueves llegás más cansada. Es solo lo que fuiste anotando." Si es una observación difícil, ofrecer una acción concreta: "¿Querés ponerte una pausa ese día?" que lleva a #/recordatorios con ese día preseleccionado.
+   - Botón "No mostrar más esta observación" (guardar ids descartados).
+
+3. Recordatorios suaves (#/recordatorios, desde Ajustes y desde el patrón)
+   - Restricción técnica: no hay servidor ni cuentas. Chequeá brevemente el estado actual de las APIs del navegador, pero NO implementes Web Push, ni nada que requiera backend, ni polling en segundo plano. Documentá en el README por qué (una PWA sin servidor no puede programar avisos locales de forma confiable).
+   - Dos mecanismos:
+     A) Aviso dentro de la app: si la app está abierta en el horario elegido, un banner suave y descartable (sin sonido salvo que los sonidos estén activados), una sola vez por momento y por día.
+     B) Exportar al calendario del celular: generar un único archivo .ics descargable con los eventos activos, recurrentes y con alarma. Al abrirlo, el calendario del teléfono avisa aunque la app esté cerrada. Pantalla con pasos breves y claros para Android y para iPhone.
+   - Hasta 3 momentos: "Antes de entrar", "Pausa de media jornada" y "Cierre del día". Cada uno con: activar, hora, días de la semana (por defecto lunes a viernes) y texto del evento editable (máx. 40 caracteres, validado; por defecto neutro: "Una pausa para mí"). Aclarar en pantalla que ese texto se va a ver en su calendario.
+   - Todos apagados por defecto. Nada se activa solo.
+   - Requisitos del .ics (RFC 5545): saltos de línea CRLF, plegado de líneas a 75 octetos, escape de caracteres especiales, UID estable y determinista por momento (para que reimportar actualice y no duplique), DTSTAMP, hora flotante sin TZID (para que siga el reloj del teléfono), RRULE:FREQ=WEEKLY;BYDAY=..., y VALARM con TRIGGER:PT0S.
+   - Ajuste "Descansar de los avisos" (vacaciones, receso): silencia banners y sugerencias de apoyo sin borrar ninguna configuración.
+   - Documentar en el README la ruta futura con Capacitor para notificaciones locales nativas. No implementarla.
+
+4. Ayuda y contactos (#/ayuda, siempre disponible)
+   - Acceso desde Ajustes y un enlace discreto al pie de Mi semana. Nunca condicionado a nada.
+   - Texto cálido y breve: la app no es terapia ni reemplaza a un profesional; si estás pasando un momento difícil, hablar con alguien de confianza o con un profesional puede ayudar; si estás en peligro o pensás en hacerte daño, llamá ahora.
+   - Recursos en src/resources.js, editable por alguien que no programa. Cada uno con nombre, qué es, teléfono, alcance y nota. Incluir exactamente estos, con un comentario "verificar antes de publicar" y la fecha de hoy:
+     * Emergencias: 911.
+     * Línea 135 (Centro de Asistencia al Suicida, Buenos Aires): gratuita desde CABA y Gran Buenos Aires. Desde el resto del país: (011) 5275-1135 y 0800 345 1435.
+   - Cada teléfono con enlace tel: para llamar con un toque.
+   - NO inventar otros teléfonos ni servicios. Dejar una sección "Recursos de mi zona" vacía, con un comentario en el archivo que explique cómo agregar los de su provincia y su obra social, después de verificarlos.
+   - NO afirmar confidencialidad, anonimato, gratuidad fuera de lo indicado, ni horarios de atención.
+   - Todo estático, funciona offline, no envía nada.
+
+5. Aviso de apoyo (muy cuidadoso)
+   - Lógica pura en src/support: devuelve si corresponde mostrar el aviso.
+   - Usa SOLO los estados que ella eligió en check-ins y cierres. "Día difícil" = el último registro del día es "triste" o "tensa" ("cansada" NO cuenta: es común y no queremos alarmar).
+   - Condición por defecto (constantes comentadas y fáciles de ajustar): al menos 6 días difíciles dentro de los últimos 10 días calendario, Y los últimos 3 días con registro son difíciles.
+   - Cuando se cumple, al abrir #/jardin aparece una tarjeta suave, descartable, sin animación llamativa, sin colores de alarma. Texto de ejemplo: "Estuvieron pesados estos días. No tenés que poder sola. Si querés, hay gente que puede acompañarte." Botones de igual peso: "Ver opciones" (lleva a #/ayuda) y "Ahora no". Más un enlace "No mostrar más este aviso".
+   - Enfriamiento: no volver a mostrarla antes de 21 días desde la última vez (fecha local guardada), aunque la condición siga cumpliéndose. "No mostrar más" la desactiva (Ajustes: "Sugerencias de apoyo", reactivable).
+   - No mostrarla justo después de guardar un registro, ni durante una pausa o respiración. Respetar "Descansar de los avisos".
+   - Prohibido en la tarjeta: preguntas, pedirle que evalúe cómo está, etiquetas, la palabra "suicidio" o "crisis", mensajes de alarma. Al guardar un estado difícil, la respuesta es la misma frase cálida de siempre.
+
+6. Guardado
+   - Subir la versión del esquema y escribir la migración desde la etapa 4 (con test). Guardar: ajustes de Mi semana, patrones y sus descartados, recordatorios, fecha del último aviso de apoyo, preferencia de sugerencias y "descansar de los avisos".
+   - Incluir todo en exportar e importar. Validar el archivo importado: rechazar horas inválidas, días fuera de rango, textos demasiado largos o ids desconocidos, sin pisar nada si algo falla.
+   - Todo acceso al almacenamiento dentro de try/catch, como antes.
+
+7. Textos
+   - Todos los textos nuevos en src/copy.js (voseo, cálidos, breves). Frases de cierre de la semana: al menos 8, para rotar.
+
+8. Calidad y accesibilidad
+   - Diseñar cada pantalla nueva con Hallmark según las reglas del proyecto y correr su revisión (audit/sloplint) sobre todas las pantallas. Informar qué marcó y qué corregiste. Si no se puede correr la parte con navegador, decirlo y correr las estáticas.
+   - La tira de días es una lista real con etiquetas de texto (no depender del dibujo ni del color). La tarjeta de apoyo y el banner de recordatorio NO usan role="alert" (para no alarmar): usar una región con etiqueta, sin anunciar de forma invasiva.
+   - Foco visible, teclado completo, botones de al menos 48px, contraste AA, ningún color hardcodeado.
+
+Tests (Vitest)
+- Semana: arranca en lunes, agrupa por día, cambios de mes y de año, no navega al futuro.
+- Patrones: respeta umbrales, prioriza lo positivo, nunca devuelve más de una observación, respeta descartes.
+- Aviso de apoyo: casos límite de la condición, "cansada" no cuenta, enfriamiento de 21 días, "No mostrar más", "Descansar de los avisos", nunca lee texto libre.
+- Generación del .ics: CRLF, plegado a 75 octetos, escapes, BYDAY correcto, UID determinista, hora flotante, y que un parser de iCalendar (como dependencia de desarrollo) lo lea sin errores.
+- Validación de recordatorios (horas, días, longitud del texto).
+- Migración de la etapa 4 a esta e importación de archivos inválidos sin modificar los datos.
+
+Criterios de aceptación
+- Ninguna pantalla muestra racha, porcentaje, total, gráfico de tendencia ni mención a días de ausencia.
+- El resumen abre con lo lindo y nunca muestra "lo que pesó" ni "lo que solté".
+- Un archivo .ics real, importado en el calendario de un Android y de un iPhone, genera los avisos en los horarios correctos aunque la app esté cerrada.
+- La pantalla de ayuda funciona offline, muestra solo los recursos verificados indicados y los teléfonos se pueden tocar para llamar.
+- El aviso de apoyo aparece solo bajo la condición definida, una vez, y respeta enfriamiento, "Ahora no" y "No mostrar más".
+- Todo lo nuevo se puede apagar desde Ajustes.
+- Se ve y se usa bien a 360x640, con una sola mano.
+- Exportar e importar funcionan de punta a punta con lo nuevo.
+- Los tests pasan (npm test).
+- Resumen final de 5 líneas máximo: qué hiciste, supuestos tomados, umbrales usados y reglas de Hallmark ignoradas (si hubo).
+
+No hagas todavía: cuentas o sincronización, Web Push o cualquier servidor, análisis del texto libre, estadísticas o gráficos de tendencia, compartir el resumen, exportar informes para un profesional, notificaciones nativas, chat o IA dentro de la app.

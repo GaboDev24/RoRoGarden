@@ -1,6 +1,8 @@
 import { palette } from '../palette/colors'
 import { copy } from '../copy'
 import { createFaIcon } from '../icons'
+import { checkInAppReminder } from '../reminders'
+import { shouldShowSupportNotice } from '../support'
 import {
   frogIdle,
   lilypad,
@@ -447,6 +449,116 @@ export function renderJardin(container: HTMLElement): () => void {
     .name-input:focus {
       outline: 3px solid var(--color-acento);
     }
+
+    .reminder-inapp-banner {
+      width: 100%;
+      max-width: 320px;
+      background-color: var(--color-crema);
+      border: 2px solid var(--color-bosque);
+      border-radius: var(--border-radius-md);
+      padding: var(--space-xs) var(--space-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-xs);
+      box-shadow: var(--shadow-sm);
+      margin-top: 4px;
+    }
+
+    .reminder-banner-text {
+      font-family: var(--font-ui);
+      font-size: var(--font-size-xs);
+      color: var(--color-tinta);
+      margin: 0;
+      line-height: 1.35;
+    }
+
+    .reminder-banner-btn {
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      background-color: var(--color-salvia);
+      color: var(--color-tinta);
+      border: 1px solid var(--color-bosque);
+      border-radius: var(--border-radius-sm);
+      padding: 4px 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .support-card-section {
+      width: 100%;
+      max-width: 320px;
+      background-color: var(--color-crema);
+      border: 2px solid var(--color-salvia);
+      border-radius: var(--border-radius-md);
+      padding: var(--space-sm) var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      margin-top: var(--space-xs);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .support-card-title {
+      font-family: var(--font-pixel);
+      font-size: 0.625rem;
+      color: var(--color-bosque);
+      margin: 0;
+    }
+
+    .support-card-msg {
+      font-family: var(--font-ui);
+      font-size: var(--font-size-xs);
+      color: var(--color-tinta);
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .support-actions-row {
+      display: flex;
+      gap: var(--space-xs);
+      margin-top: 4px;
+    }
+
+    .support-action-btn {
+      flex: 1;
+      font-family: var(--font-ui);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      padding: var(--space-xs);
+      border-radius: var(--border-radius-sm);
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+    }
+
+    .support-action-btn.primary {
+      background-color: var(--color-salvia);
+      color: var(--color-tinta);
+      border: 1px solid var(--color-bosque);
+    }
+
+    .support-action-btn.secondary {
+      background-color: transparent;
+      color: var(--color-tinta);
+      border: 1px solid var(--color-agua-profunda);
+    }
+
+    .support-never-link {
+      align-self: center;
+      font-family: var(--font-ui);
+      font-size: 11px;
+      color: var(--color-agua-profunda);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 4px;
+    }
   `
   document.head.appendChild(style)
 
@@ -493,6 +605,19 @@ export function renderJardin(container: HTMLElement): () => void {
   nav.appendChild(backBtn)
   nav.appendChild(coleccionBtn)
   nav.appendChild(acomodarTopBtn)
+
+  if (gardenState.showWeekInGarden !== false) {
+    const semanaBtn = document.createElement('button')
+    semanaBtn.className = 'nav-btn'
+    semanaBtn.appendChild(createFaIcon('bookOpen', { size: 12 }))
+    semanaBtn.appendChild(document.createTextNode(copy.jardin.semanaBtn))
+    semanaBtn.setAttribute('aria-label', 'Ver resumen de mi semana')
+    semanaBtn.addEventListener('click', () => {
+      window.location.hash = '#/semana'
+    })
+    nav.appendChild(semanaBtn)
+  }
+
   nav.appendChild(settingsBtn)
 
   // ── 2. Cabecera ──
@@ -878,10 +1003,128 @@ export function renderJardin(container: HTMLElement): () => void {
   actions.appendChild(diarioBtn)
   actions.appendChild(historialBtn)
 
+  // ── 4.5. Banner In-App de Recordatorio (si coincide horario y no está descartado hoy) ──
+  const activeReminder = checkInAppReminder(
+    gardenState.reminders ?? [],
+    new Date(),
+    gardenState.dismissedInAppReminders ?? {},
+    gardenState.vacationMode,
+    today
+  )
+
+  let reminderBanner: HTMLElement | null = null
+  if (activeReminder) {
+    reminderBanner = document.createElement('div')
+    reminderBanner.className = 'reminder-inapp-banner'
+    reminderBanner.setAttribute('role', 'region')
+    reminderBanner.setAttribute('aria-label', 'Recordatorio de pausa')
+
+    const bText = document.createElement('p')
+    bText.className = 'reminder-banner-text'
+    bText.textContent = `⏰ ${activeReminder.eventText}`
+
+    const bDismiss = document.createElement('button')
+    bDismiss.type = 'button'
+    bDismiss.className = 'reminder-banner-btn'
+    bDismiss.textContent = 'Aflojar'
+    bDismiss.addEventListener('click', () => {
+      gardenState = {
+        ...gardenState,
+        dismissedInAppReminders: {
+          ...(gardenState.dismissedInAppReminders ?? {}),
+          [activeReminder.id]: today,
+        },
+      }
+      saveGardenState(gardenState)
+      reminderBanner?.remove()
+      window.location.hash = '#/pausa'
+    })
+
+    reminderBanner.appendChild(bText)
+    reminderBanner.appendChild(bDismiss)
+  }
+
+  // ── 4.6. Tarjeta de Apoyo Sensible (si cumple condiciones muy cuidadosas) ──
+  let supportCard: HTMLElement | null = null
+  const allEntries = entriesRes.success && entriesRes.data ? entriesRes.data : []
+  const showSupport = shouldShowSupportNotice({
+    entries: allEntries,
+    currentDateStr: today,
+    lastNoticeDateStr: gardenState.lastSupportNoticeDate,
+    supportSuggestionsEnabled: gardenState.supportSuggestionsEnabled,
+    vacationMode: gardenState.vacationMode,
+  })
+
+  if (showSupport) {
+    supportCard = document.createElement('article')
+    supportCard.className = 'support-card-section'
+    supportCard.setAttribute('role', 'region')
+    supportCard.setAttribute('aria-label', copy.apoyo.cardTitle)
+
+    const sTitle = document.createElement('h2')
+    sTitle.className = 'support-card-title'
+    sTitle.textContent = copy.apoyo.cardTitle
+
+    const sMsg = document.createElement('p')
+    sMsg.className = 'support-card-msg'
+    sMsg.textContent = copy.apoyo.cardMessage
+
+    const sActions = document.createElement('div')
+    sActions.className = 'support-actions-row'
+
+    const sHelpBtn = document.createElement('a')
+    sHelpBtn.className = 'support-action-btn primary'
+    sHelpBtn.href = '#/ayuda'
+    sHelpBtn.textContent = copy.apoyo.cardHelpBtn
+    sHelpBtn.addEventListener('click', () => {
+      gardenState = {
+        ...gardenState,
+        lastSupportNoticeDate: today,
+      }
+      saveGardenState(gardenState)
+    })
+
+    const sDismissBtn = document.createElement('button')
+    sDismissBtn.type = 'button'
+    sDismissBtn.className = 'support-action-btn secondary'
+    sDismissBtn.textContent = copy.apoyo.cardDismissBtn
+    sDismissBtn.addEventListener('click', () => {
+      gardenState = {
+        ...gardenState,
+        lastSupportNoticeDate: today,
+      }
+      saveGardenState(gardenState)
+      supportCard?.remove()
+    })
+
+    const sNeverBtn = document.createElement('button')
+    sNeverBtn.type = 'button'
+    sNeverBtn.className = 'support-never-link'
+    sNeverBtn.textContent = copy.apoyo.cardNeverBtn
+    sNeverBtn.addEventListener('click', () => {
+      gardenState = {
+        ...gardenState,
+        supportSuggestionsEnabled: false,
+        lastSupportNoticeDate: today,
+      }
+      saveGardenState(gardenState)
+      supportCard?.remove()
+    })
+
+    sActions.appendChild(sHelpBtn)
+    sActions.appendChild(sDismissBtn)
+    supportCard.appendChild(sTitle)
+    supportCard.appendChild(sMsg)
+    supportCard.appendChild(sActions)
+    supportCard.appendChild(sNeverBtn)
+  }
+
   // Ensamblar pantalla
   section.appendChild(nav)
   section.appendChild(header)
+  if (reminderBanner) section.appendChild(reminderBanner)
   section.appendChild(stageWrapper)
+  if (supportCard) section.appendChild(supportCard)
   section.appendChild(actions)
   container.appendChild(section)
 
