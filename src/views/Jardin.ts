@@ -131,29 +131,34 @@ export function renderJardin(container: HTMLElement): () => void {
     .jardin-nav {
       width: 100%;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: var(--space-xs);
+      gap: 6px;
       z-index: 10;
     }
 
     .nav-btn {
-      font-family: var(--font-pixel);
-      font-size: 0.625rem;
+      font-family: var(--font-ui);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
       color: var(--color-tinta);
       background-color: var(--color-menta);
       border: 2px solid var(--color-bosque);
       border-radius: var(--border-radius-sm);
-      padding: var(--space-xs) var(--space-sm);
+      padding: 6px 10px;
       min-height: var(--touch-target-min);
       min-width: var(--touch-target-min);
       cursor: pointer;
-      line-height: 1.6;
+      line-height: 1.25;
+      white-space: normal;
+      text-align: center;
+      box-sizing: border-box;
       transition: transform var(--transition-fast), opacity var(--transition-fast);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 5px;
     }
 
     .nav-btn:hover {
@@ -365,6 +370,11 @@ export function renderJardin(container: HTMLElement): () => void {
       justify-content: center;
       gap: var(--space-sm);
       text-align: center;
+      line-height: 1.3;
+      white-space: normal;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      box-sizing: border-box;
       transition: transform var(--transition-fast), opacity var(--transition-fast);
     }
 
@@ -474,15 +484,18 @@ export function renderJardin(container: HTMLElement): () => void {
     }
 
     .reminder-banner-btn {
-      font-family: var(--font-pixel);
-      font-size: 0.5rem;
+      font-family: var(--font-ui);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
       background-color: var(--color-salvia);
       color: var(--color-tinta);
       border: 1px solid var(--color-bosque);
       border-radius: var(--border-radius-sm);
-      padding: 4px 6px;
+      padding: 6px 10px;
       cursor: pointer;
       flex-shrink: 0;
+      min-height: 36px;
+      box-sizing: border-box;
     }
 
     .support-card-section {
@@ -1205,8 +1218,10 @@ export function renderJardin(container: HTMLElement): () => void {
     btnRow.style.cssText = 'display: flex; gap: var(--space-xs); width: 100%; margin-top: var(--space-xs);'
 
     const skipBtn = document.createElement('button')
-    skipBtn.className = 'nav-btn'
+    skipBtn.className = 'action-btn secondary'
     skipBtn.style.flex = '1'
+    skipBtn.style.padding = 'var(--space-xs)'
+    skipBtn.style.fontSize = 'var(--font-size-sm)'
     skipBtn.textContent = copy.jardin.frogNameSkip
     skipBtn.addEventListener('click', () => {
       gardenState = {

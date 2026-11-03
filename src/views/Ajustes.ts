@@ -50,8 +50,9 @@ export function renderAjustes(container: HTMLElement): () => void {
     }
 
     .back-btn {
-      font-family: var(--font-pixel);
-      font-size: 0.625rem;
+      font-family: var(--font-ui);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
       color: var(--color-tinta);
       background-color: var(--color-menta);
       border: 2px solid var(--color-bosque);
@@ -61,10 +62,11 @@ export function renderAjustes(container: HTMLElement): () => void {
       min-width: var(--touch-target-min);
       cursor: pointer;
       align-self: flex-start;
-      line-height: 1.6;
+      line-height: 1.3;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
       transition: transform var(--transition-fast), opacity var(--transition-fast);
     }
 
@@ -159,6 +161,11 @@ export function renderAjustes(container: HTMLElement): () => void {
       justify-content: center;
       transition: transform var(--transition-fast), opacity var(--transition-fast);
       text-align: center;
+      line-height: 1.35;
+      white-space: normal;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      box-sizing: border-box;
     }
 
     .btn-primary {

@@ -59,8 +59,9 @@ export function renderRecordatorios(container: HTMLElement): () => void {
     }
 
     .back-btn {
-      font-family: var(--font-pixel);
-      font-size: 0.625rem;
+      font-family: var(--font-ui);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
       color: var(--color-tinta);
       background-color: var(--color-menta);
       border: 2px solid var(--color-bosque);
@@ -70,10 +71,11 @@ export function renderRecordatorios(container: HTMLElement): () => void {
       min-width: var(--touch-target-min);
       cursor: pointer;
       align-self: flex-start;
-      line-height: 1.6;
+      line-height: 1.3;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
       transition: transform var(--transition-fast), opacity var(--transition-fast);
     }
 
@@ -212,19 +214,21 @@ export function renderRecordatorios(container: HTMLElement): () => void {
     }
 
     .day-pill-btn {
-      font-family: var(--font-pixel);
-      font-size: 0.5625rem;
+      font-family: var(--font-ui);
+      font-size: var(--font-size-sm);
+      font-weight: 700;
       color: var(--color-tinta);
       background-color: var(--color-salvia);
       border: 2px solid var(--color-bosque);
       border-radius: var(--border-radius-sm);
-      min-width: 36px;
+      min-width: 38px;
       min-height: 38px;
       padding: 2px 6px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
       transition: background-color var(--transition-fast), transform var(--transition-fast);
     }
 
@@ -275,6 +279,10 @@ export function renderRecordatorios(container: HTMLElement): () => void {
       align-items: center;
       justify-content: center;
       gap: var(--space-sm);
+      text-align: center;
+      line-height: 1.35;
+      white-space: normal;
+      box-sizing: border-box;
       transition: transform var(--transition-fast), opacity var(--transition-fast);
     }
 

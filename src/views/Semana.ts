@@ -55,8 +55,9 @@ export function renderSemana(container: HTMLElement): () => void {
     }
 
     .back-btn {
-      font-family: var(--font-pixel);
-      font-size: 0.625rem;
+      font-family: var(--font-ui);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
       color: var(--color-tinta);
       background-color: var(--color-menta);
       border: 2px solid var(--color-bosque);
@@ -65,10 +66,11 @@ export function renderSemana(container: HTMLElement): () => void {
       min-height: var(--touch-target-min);
       min-width: var(--touch-target-min);
       cursor: pointer;
-      line-height: 1.6;
+      line-height: 1.3;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
       transition: transform var(--transition-fast), opacity var(--transition-fast);
     }
 
@@ -104,15 +106,18 @@ export function renderSemana(container: HTMLElement): () => void {
     }
 
     .week-nav-btn {
-      font-family: var(--font-pixel);
-      font-size: 0.5625rem;
+      font-family: var(--font-ui);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
       color: var(--color-tinta);
       background-color: var(--color-salvia);
       border: 1px solid var(--color-bosque);
       border-radius: var(--border-radius-sm);
-      padding: 4px 8px;
+      padding: 6px 10px;
       min-height: 36px;
       cursor: pointer;
+      box-sizing: border-box;
+      white-space: nowrap;
       transition: opacity var(--transition-fast);
     }
 
@@ -157,8 +162,9 @@ export function renderSemana(container: HTMLElement): () => void {
     }
 
     .day-strip-name {
-      font-family: var(--font-pixel);
-      font-size: 0.5rem;
+      font-family: var(--font-ui);
+      font-size: var(--font-size-xs);
+      font-weight: 700;
       color: var(--color-bosque);
       margin: 0;
     }
@@ -271,6 +277,9 @@ export function renderSemana(container: HTMLElement): () => void {
       text-decoration: none;
       display: inline-flex;
       align-items: center;
+      line-height: 1.35;
+      white-space: normal;
+      box-sizing: border-box;
     }
 
     .pattern-dismiss-btn {

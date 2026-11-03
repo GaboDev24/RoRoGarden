@@ -101,6 +101,10 @@ button {
   background: none;
   min-height: var(--touch-target-min);
   min-width: var(--touch-target-min);
+  box-sizing: border-box;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
   /* Floor rule 6: focus-visible visible al instante */
   outline-offset: 3px;
 }
@@ -109,6 +113,16 @@ button:focus-visible {
   outline: 3px solid var(--color-bosque);
   outline-offset: 3px;
   border-radius: var(--border-radius-sm);
+}
+
+.btn-action,
+.action-btn,
+.nav-btn,
+.back-btn {
+  box-sizing: border-box;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* ── Canvas pixelado ── */

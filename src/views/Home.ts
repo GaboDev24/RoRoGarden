@@ -107,6 +107,11 @@ export function renderHome(container: HTMLElement): () => void {
       padding: var(--space-md) var(--space-xl);
       min-height: var(--touch-target-min);
       min-width: 200px;
+      max-width: 100%;
+      box-sizing: border-box;
+      white-space: normal;
+      overflow-wrap: break-word;
+      word-break: break-word;
       cursor: pointer;
       line-height: 1.8;
       transition: transform var(--transition-fast), opacity var(--transition-fast);

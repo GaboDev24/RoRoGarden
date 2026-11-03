@@ -37,7 +37,7 @@ export const copy = {
     semanaBtn: 'Mi semana',
     ajustesBtn: 'Ajustes',
     decorarBtn: 'Acomodar',
-    coleccionBtn: 'Mi colección',
+    coleccionBtn: 'Colección',
     frogNamePrompt: '¿Le querés poner un nombre a tu sapo?',
     frogNamePlaceholder: 'Hasta 20 letras...',
     frogNameSkip: 'Dejarlo sin nombre',
@@ -54,7 +54,7 @@ export const copy = {
   coleccion: {
     title: 'Mi colección',
     emptyHint: 'Acá van a aparecer los visitantes y objetos que conseguís.',
-    back: '← Volver al jardín',
+    back: '← Volver',
     categoryVisitantes: 'Visitantes',
     categoryHongos: 'Hongos',
     categoryPlantas: 'Plantas',
@@ -210,7 +210,7 @@ export const copy = {
   recordatorios: {
     title: 'Recordatorios suaves',
     subtitle: 'Elegí momentos del día para aflojar. Vos tenés el control total.',
-    backToSettings: '← Volver a ajustes',
+    backToSettings: '← Volver',
     vacationLabel: 'Descansar de los avisos',
     vacationDesc: 'Silencia los avisos en vacaciones o recesos sin borrar tu configuración.',
     exportIcsBtn: 'Descargar para mi calendario (.ics)',
