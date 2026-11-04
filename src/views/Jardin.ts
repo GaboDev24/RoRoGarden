@@ -131,34 +131,42 @@ export function renderJardin(container: HTMLElement): () => void {
     .jardin-nav {
       width: 100%;
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: center;
       justify-content: space-between;
-      gap: 6px;
+      gap: 4px;
       z-index: 10;
     }
 
     .nav-btn {
       font-family: var(--font-ui);
-      font-size: var(--font-size-xs);
+      font-size: 11px;
       font-weight: 600;
       color: var(--color-tinta);
       background-color: var(--color-menta);
-      border: 2px solid var(--color-bosque);
+      border: 1.5px solid var(--color-bosque);
       border-radius: var(--border-radius-sm);
-      padding: 6px 10px;
-      min-height: var(--touch-target-min);
-      min-width: var(--touch-target-min);
+      padding: 6px 4px;
+      min-height: 40px;
       cursor: pointer;
-      line-height: 1.25;
-      white-space: normal;
+      line-height: 1.2;
+      white-space: nowrap;
       text-align: center;
       box-sizing: border-box;
       transition: transform var(--transition-fast), opacity var(--transition-fast);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 4px;
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .nav-btn.nav-btn-icon {
+      flex: 0 0 40px;
+      min-width: 40px;
+      max-width: 40px;
+      padding: 0;
     }
 
     .nav-btn:hover {
@@ -348,29 +356,29 @@ export function renderJardin(container: HTMLElement): () => void {
 
     .jardin-actions {
       width: 100%;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: var(--space-xs);
       margin-top: var(--space-xs);
     }
 
     .action-btn {
       font-family: var(--font-ui);
-      font-size: var(--font-size-md);
+      font-size: var(--font-size-sm);
       font-weight: 600;
       color: var(--color-crema);
       background-color: var(--color-bosque);
       border: 2px solid var(--color-tinta);
       border-radius: var(--border-radius-md);
-      padding: var(--space-sm) var(--space-md);
+      padding: var(--space-xs) var(--space-xs);
       min-height: var(--touch-target-min);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: var(--space-sm);
+      gap: 6px;
       text-align: center;
-      line-height: 1.3;
+      line-height: 1.25;
       white-space: normal;
       overflow-wrap: break-word;
       word-break: break-word;
@@ -608,8 +616,8 @@ export function renderJardin(container: HTMLElement): () => void {
   })
 
   const settingsBtn = document.createElement('button')
-  settingsBtn.className = 'nav-btn'
-  settingsBtn.appendChild(createFaIcon('gear', { size: 12 }))
+  settingsBtn.className = 'nav-btn nav-btn-icon'
+  settingsBtn.appendChild(createFaIcon('gear', { size: 14 }))
   settingsBtn.setAttribute('aria-label', 'Ajustes')
   settingsBtn.addEventListener('click', () => {
     window.location.hash = '#/ajustes'
@@ -981,7 +989,7 @@ export function renderJardin(container: HTMLElement): () => void {
 
   const pausaBtn = document.createElement('button')
   pausaBtn.className = 'action-btn'
-  pausaBtn.appendChild(createFaIcon('spa', { size: 18 }))
+  pausaBtn.appendChild(createFaIcon('spa', { size: 15 }))
   pausaBtn.appendChild(document.createTextNode(copy.jardin.pausaBtn))
   pausaBtn.addEventListener('click', () => {
     window.location.hash = '#/pausa'
@@ -989,7 +997,7 @@ export function renderJardin(container: HTMLElement): () => void {
 
   const checkinBtn = document.createElement('button')
   checkinBtn.className = 'action-btn secondary'
-  checkinBtn.appendChild(createFaIcon('frog', { size: 18 }))
+  checkinBtn.appendChild(createFaIcon('frog', { size: 15 }))
   checkinBtn.appendChild(document.createTextNode(copy.jardin.checkinBtn))
   checkinBtn.addEventListener('click', () => {
     window.location.hash = '#/checkin'
@@ -997,7 +1005,7 @@ export function renderJardin(container: HTMLElement): () => void {
 
   const diarioBtn = document.createElement('button')
   diarioBtn.className = 'action-btn secondary'
-  diarioBtn.appendChild(createFaIcon('moon', { size: 18 }))
+  diarioBtn.appendChild(createFaIcon('moon', { size: 15 }))
   diarioBtn.appendChild(document.createTextNode(copy.jardin.diarioBtn))
   diarioBtn.addEventListener('click', () => {
     window.location.hash = '#/diario'
@@ -1005,7 +1013,7 @@ export function renderJardin(container: HTMLElement): () => void {
 
   const historialBtn = document.createElement('button')
   historialBtn.className = 'action-btn tertiary'
-  historialBtn.appendChild(createFaIcon('bookOpen', { size: 18 }))
+  historialBtn.appendChild(createFaIcon('bookOpen', { size: 15 }))
   historialBtn.appendChild(document.createTextNode(copy.jardin.historialBtn))
   historialBtn.addEventListener('click', () => {
     window.location.hash = '#/historial'

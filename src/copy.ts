@@ -34,7 +34,7 @@ export const copy = {
     checkinBtn: '¿Cómo llegás hoy?',
     diarioBtn: 'Cerrar el día',
     historialBtn: 'Mis días',
-    semanaBtn: 'Mi semana',
+    semanaBtn: 'Semana',
     ajustesBtn: 'Ajustes',
     decorarBtn: 'Acomodar',
     coleccionBtn: 'Colección',
