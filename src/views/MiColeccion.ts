@@ -88,8 +88,9 @@ export function renderMiColeccion(container: HTMLElement): () => void {
     }
 
     .btn-acomodar-top {
-      font-family: var(--font-pixel);
-      font-size: 0.625rem;
+      font-family: var(--font-ui);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
       color: var(--color-crema);
       background-color: var(--color-bosque);
       border: 2px solid var(--color-tinta);
@@ -100,6 +101,8 @@ export function renderMiColeccion(container: HTMLElement): () => void {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      white-space: nowrap;
+      box-sizing: border-box;
       transition: transform var(--transition-fast), opacity var(--transition-fast);
     }
 

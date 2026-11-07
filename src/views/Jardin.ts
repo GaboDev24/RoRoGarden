@@ -282,35 +282,37 @@ export function renderJardin(container: HTMLElement): () => void {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       grid-template-rows: repeat(5, 1fr);
-      gap: 2px;
-      padding: 4px;
+      gap: 0;
+      padding: 0;
       box-sizing: border-box;
-      background-color: rgba(43, 58, 66, 0.4);
+      background-color: rgba(43, 58, 66, 0.35);
       z-index: 15;
     }
 
     .grid-cell-btn {
-      background-color: rgba(246, 239, 201, 0.25);
-      border: 1px dashed var(--color-crema);
-      border-radius: 4px;
+      background-color: rgba(246, 239, 201, 0.15);
+      border: 1px dashed rgba(246, 239, 201, 0.45);
+      border-radius: 0;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 0;
+      box-sizing: border-box;
       position: relative;
       transition: background-color var(--transition-fast);
-      min-width: 44px;
-      min-height: 38px;
+      width: 100%;
+      height: 100%;
     }
 
     .grid-cell-btn:hover, .grid-cell-btn:focus-visible {
-      background-color: rgba(246, 239, 201, 0.6);
+      background-color: rgba(246, 239, 201, 0.5);
       outline: 2px solid var(--color-acento);
+      outline-offset: -2px;
     }
 
     .grid-cell-btn.center-frog {
-      background-color: rgba(63, 111, 94, 0.4);
+      background-color: rgba(63, 111, 94, 0.45);
       border: 1px solid var(--color-bosque);
       cursor: default;
     }
@@ -685,7 +687,7 @@ export function renderJardin(container: HTMLElement): () => void {
   const triggerFrogTap = () => {
     playChime()
     // Animación de salto chiquito
-    frogHopOffset = -6
+    frogHopOffset = -10
     if (frogHopTimer) clearTimeout(frogHopTimer)
     frogHopTimer = setTimeout(() => {
       frogHopOffset = 0
@@ -706,13 +708,13 @@ export function renderJardin(container: HTMLElement): () => void {
 
   canvasContainer.addEventListener('click', (e) => {
     if (isAcomodarMode) return
-    // Tocar el área central (sapo)
+    // Tocar el área central (sapo sentado en el nenúfar)
     const rect = canvasContainer.getBoundingClientRect()
     const clickX = e.clientX - rect.left
     const clickY = e.clientY - rect.top
-    const midX = rect.width / 2
-    const midY = rect.height / 2
-    if (Math.abs(clickX - midX) < 45 && Math.abs(clickY - midY) < 45) {
+    const frogCenterX = 140
+    const frogCenterY = 130
+    if (Math.abs(clickX - frogCenterX) < 42 && Math.abs(clickY - frogCenterY) < 42) {
       triggerFrogTap()
     }
   })
@@ -799,8 +801,8 @@ export function renderJardin(container: HTMLElement): () => void {
     if (canAnimate) {
       tickSprite(instFrog, timestamp)
     }
-    const frogX = padX + 8
-    const frogY = padY - 14 + frogHopOffset
+    const frogX = padX - 4
+    const frogY = padY - 44 + frogHopOffset
     drawSprite(ctx, instFrog, frogX, frogY, 2)
   }
 
@@ -856,6 +858,8 @@ export function renderJardin(container: HTMLElement): () => void {
         if (c === 2 && r === 3) {
           cellBtn.classList.add('center-frog')
           cellBtn.disabled = true
+          cellBtn.title = 'Lugar del sapo'
+          cellBtn.innerHTML = '<span style="font-size: 14px; opacity: 0.85;" aria-hidden="true">🐸</span>'
           gridOverlay.appendChild(cellBtn)
           continue
         }
