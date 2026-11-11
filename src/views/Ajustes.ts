@@ -941,6 +941,62 @@ export function renderAjustes(container: HTMLElement): () => void {
   clearGroup.appendChild(clrDesc)
   clearGroup.appendChild(clrBtn)
 
+  // Grupo: App (bienvenida, instalar, acerca)
+  const appGroup = document.createElement('div')
+  appGroup.className = 'settings-group'
+
+  const appGroupTitle = document.createElement('h2')
+  appGroupTitle.className = 'group-title'
+  appGroupTitle.textContent = 'La app'
+  appGroup.appendChild(appGroupTitle)
+
+  const welcomeBtn = document.createElement('button')
+  welcomeBtn.type = 'button'
+  welcomeBtn.className = 'btn-action btn-secondary'
+  welcomeBtn.textContent = copy.ajustes.welcomeBtn
+  welcomeBtn.addEventListener('click', () => { window.location.hash = '#/bienvenida' })
+  appGroup.appendChild(welcomeBtn)
+
+  const installBtn = document.createElement('button')
+  installBtn.type = 'button'
+  installBtn.className = 'btn-action btn-secondary'
+  installBtn.textContent = copy.ajustes.installBtn
+  installBtn.addEventListener('click', () => { window.location.hash = '#/instalar' })
+  appGroup.appendChild(installBtn)
+
+  const aboutBtn = document.createElement('button')
+  aboutBtn.type = 'button'
+  aboutBtn.className = 'btn-action btn-secondary'
+  aboutBtn.textContent = copy.ajustes.aboutBtn
+  aboutBtn.addEventListener('click', () => { window.location.hash = '#/acerca' })
+  appGroup.appendChild(aboutBtn)
+
+  // Tarjeta de actualización disponible (SW)
+  const updateCard = document.createElement('div')
+  updateCard.id = 'ajustes-update-card'
+  updateCard.style.display = 'none'
+  updateCard.className = 'update-card'
+
+  const updateText = document.createElement('p')
+  updateText.className = 'update-card-text'
+  updateText.textContent = copy.updateReady.text
+  updateCard.appendChild(updateText)
+
+  const updateBtn = document.createElement('button')
+  updateBtn.type = 'button'
+  updateBtn.className = 'btn-primary'
+  updateBtn.style.marginTop = 'var(--space-xs)'
+  updateBtn.textContent = copy.updateReady.updateBtn
+  updateBtn.addEventListener('click', () => window.location.reload())
+  updateCard.appendChild(updateBtn)
+
+  appGroup.appendChild(updateCard)
+
+  // Escuchar evento de SW actualizado
+  document.addEventListener('swUpdated', () => {
+    updateCard.style.display = 'block'
+  }, { once: true })
+
   // Ensamblar
   section.appendChild(backBtn)
   section.appendChild(header)
@@ -952,6 +1008,7 @@ export function renderAjustes(container: HTMLElement): () => void {
   section.appendChild(exportGroup)
   section.appendChild(importGroup)
   section.appendChild(clearGroup)
+  section.appendChild(appGroup)
   section.appendChild(toastLabel)
   container.appendChild(section)
 

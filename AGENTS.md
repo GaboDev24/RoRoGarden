@@ -110,7 +110,21 @@ Se implementó:
 - **Ajustes y accesibilidad (`src/views/Ajustes.ts`)**: Toggles para "Mi semana en el jardín", días a mostrar (L-V / Toda la semana), patrones suaves, acceso a recordatorios, "Descansar de los avisos", sugerencias de apoyo y ayuda.
 - **Tests unitarios completos en Vitest**: 61 tests pasando en 10 suites de prueba (incluyendo lectura de `.ics` con `node-ical`). Build y sloplint limpios.
 
-**No implementar todavía:** cuentas o sincronización en la nube, Web Push o servidores remotos, análisis NLP de texto libre, estadísticas o gráficos de tendencia, exportar informes clínicos, chat o IA dentro de la app.
+## 📁 Alcance de Etapa 6 (Completada)
+
+Se implementó:
+- **Primera vez cuidada (`src/views/Bienvenida.ts`, `#/bienvenida`)**: Flujo de bienvenida en 3 pantallas saltables con explicación cálida, privacidad honesta, carácter opcional de la experiencia, nombre opcional para el sapo y aclaración médica/psicológica sin alarmismo. Reaccesible siempre desde Ajustes.
+- **Instalación PWA guiada (`src/views/Instalar.ts`, `#/instalar`)**: Guía para Android (Chrome) e iPhone (Safari), botón "Instalar" nativo ante `beforeinstallprompt`, detección de modo standalone ("Ya está instalada") y solicitud silenciosa de almacenamiento persistente (`navigator.storage.persist()`).
+- **Web App Manifest e íconos completos**: Manifest adaptado (`lang: es-AR`, shortcuts directos a Check-in, Pausa y Diario) e íconos pixel art generados con script reproducible (`scripts/make-icons.py`): `pwa-512-maskable.png` con zona segura del 10% y `apple-touch-icon.png` (180x180) con fondo menta.
+- **Actualizaciones suaves (Service Worker)**: Configurado modo de actualización `prompt` ("avisar, no forzar") con tarjeta no intrusiva en el jardín y Ajustes cuando hay nueva versión, sin recargar nunca de manera imprevista.
+- **Acerca de y privacidad (`src/views/Acerca.ts`, `#/acerca`)**: Pantalla informativa con versión 1.0.0, detalle de almacenamiento local, nota honesta sobre servidores de alojamiento, créditos de arte pixel art original y tipografía Press Start 2P (OFL 1.1), más constante configurable `FEEDBACK_URL`.
+- **Estabilidad, captura de errores y routing (`src/views/Error.ts`)**: Captura global de errores no controlados y promesas rechazadas ("Algo no salió bien. Tus datos están a salvo.") con botones para volver al jardín o recargar; rutas desconocidas redirigen automáticamente al jardín; limpieza estricta de listeners en navegación.
+- **Cero dependencias remotas y fuentes locales**: Empaquetado local de los archivos WOFF2 de `Press Start 2P` en `public/fonts/`, eliminando toda petición a CDNs externas en tiempo de ejecución.
+- **Seguridad estricta (CSP, Headers y Referencias)**: Meta etiquetas y archivo `public/_headers` con CSP estricta, `Referrer-Policy: no-referrer` y `Permissions-Policy` restrictiva. Inclusión de `referencias/` en `.gitignore`.
+- **Publicación y automatización**: Workflow de GitHub Actions (`.github/workflows/deploy.yml`) para despliegue automatizado en GitHub Pages, soporte de subrutas configurables vía `VITE_BASE`, guías completas de despliegue (`DEPLOY.md`), post-despliegue (`POSTDEPLOY.md`), guía para la docente (`GUIA-MAESTRA.md`), protocolo de prueba (`PRUEBA.md`) y lista de verificación accesible (`A11Y-CHECKLIST.md`).
+- **Tests y verificación**: 68 tests pasando en 11 suites de Vitest (`npm test`). Build de producción de 54.9 kB gzip (límite: 150 kB). `npm audit` limpio con 0 vulnerabilidades.
+
+**No implementar nunca:** cuentas o sincronización en la nube, Web Push o servidores remotos, análisis NLP de texto libre, estadísticas o gráficos de tendencia, exportar informes clínicos, chat o IA dentro de la app.
 
 
 

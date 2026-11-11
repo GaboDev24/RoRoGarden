@@ -288,7 +288,84 @@ export const copy = {
     clearSecondConfirm: 'Última confirmación: se borrará todo definitivamente. ¿Continuar?',
     clearSuccess: 'Se han eliminado todos los datos locales.',
     storageWarning: 'Atención: el almacenamiento local no está disponible o está bloqueado en este navegador. Tus datos no podrán guardarse entre sesiones.',
+
+    // Etapa 6
+    welcomeBtn: 'Ver la bienvenida',
+    installBtn: 'Instalar la app',
+    aboutBtn: 'Acerca de y privacidad',
   },
+
+  bienvenida: {
+    step1Title: 'Hola, bienvenida 🐸',
+    step1Text: 'RoRoGarden es tu rincón personal para aflojar un ratito entre clase y clase. Un jardín tranquilo solo para vos, sin presiones ni obligaciones.',
+    step2Title: 'Tus datos son tuyos',
+    step2Text: 'Tus datos viven solo en este celular. La app no los envía a ningún lado ni los comparte con nadie.',
+    step2Note: 'El servicio que aloja la página puede registrar que alguien la visitó, como cualquier sitio web, pero sin ver lo que escribís adentro.',
+    step3Title: 'Todo es opcional',
+    step3Text: 'Podés usar lo que quieras y saltear lo que no. Esta app no es terapia ni reemplaza a un profesional de la salud: si necesitás ayuda, siempre podés buscar a alguien de confianza.',
+    step3NameLabel: '¿Le querés poner un nombre a tu sapo? (opcional)',
+    step3NamePlaceholder: 'Hasta 20 letras...',
+    step3Disclaimer: 'RoRoGarden no es terapia ni consejo médico. Ante cualquier dificultad, hablar con un profesional es la mejor opción.',
+    skipBtn: 'Saltar',
+    nextBtn: 'Siguiente →',
+    enterBtn: 'Entrar al jardín',
+    finishBtn: 'Ir al jardín',
+  },
+
+  instalar: {
+    title: 'Instalá la app',
+    subtitle: '¿Por qué conviene instalarla?',
+    whyText: 'Cuando instalás RoRoGarden, funciona como una app del celular: se abre a pantalla completa, carga más rápido y tus datos quedan mejor guardados incluso sin conexión.',
+    androidTitle: 'En Android (Chrome)',
+    androidSteps: [
+      'Abrí esta página en Chrome.',
+      'Tocá los tres puntos arriba a la derecha.',
+      'Elegí "Agregar a pantalla de inicio".',
+      'Confirmá con "Agregar".',
+    ],
+    iosTitle: 'En iPhone (Safari)',
+    iosSteps: [
+      'Abrí esta página en Safari.',
+      'Tocá el ícono de Compartir (el cuadrado con la flecha).',
+      'Elegí "Agregar a pantalla de inicio".',
+      'Confirmá con "Agregar".',
+    ],
+    installBtnLabel: 'Instalar',
+    alreadyInstalled: '✓ Ya está instalada. Podés cerrar esta pantalla.',
+    back: '← Volver',
+  },
+
+  acerca: {
+    title: 'Acerca de y privacidad',
+    versionLabel: 'Versión',
+    privacyTitle: 'Qué se guarda y dónde',
+    privacyText: 'RoRoGarden guarda tus check-ins, diario, decoraciones y preferencias solo en este dispositivo, en el almacenamiento del navegador (localStorage). La app no tiene servidor propio ni envía tus registros a ningún lado.',
+    hostingNote: 'El servicio que aloja la página (como GitHub Pages o Cloudflare) puede registrar las visitas al sitio como cualquier sitio web, pero sin recibir el contenido de tus registros.',
+    notTherapy: 'Esta app no es terapia ni consejo médico. Ante cualquier dificultad, hablar con un profesional de la salud es siempre la mejor opción.',
+    creditsTitle: 'Créditos',
+    creditsText: 'Arte y sprites: pixel art original creado para RoRoGarden.',
+    fontCredit: 'Tipografía: Press Start 2P, diseñada por CodeMan38, bajo licencia SIL Open Font License 1.1.',
+    licenseNote: 'El código fuente no tiene licencia asignada todavía. Ver NOTAS.md.',
+    feedbackTitle: 'Comentarios',
+    feedbackEmpty: '',
+    back: '← Volver',
+  },
+
+  error: {
+    title: 'Algo no salió bien',
+    text: 'Tus datos están a salvo. Podés volver al jardín o recargar la página.',
+    gardenBtn: 'Volver al jardín',
+    reloadBtn: 'Recargar',
+  },
+
+  updateReady: {
+    title: 'Hay una versión nueva',
+    text: 'Actualizá cuando quieras.',
+    updateBtn: 'Actualizar',
+    dismissBtn: 'Ahora no',
+  },
+
+  storageFullWarning: 'El almacenamiento de este dispositivo está lleno o no disponible. Te recomendamos exportar una copia de tus datos desde Ajustes.',
 } as const
 
 export type Copy = typeof copy

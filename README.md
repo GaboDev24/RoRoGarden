@@ -123,6 +123,20 @@ Para una eventual distribución en tiendas (Google Play Store o Apple App Store)
 - `frog-stretching` — Sapo estirando brazos y cuello (32x32)
 - `frog-ears` — Sapo tapándose los oídos en momento de silencio (32x32)
 
+## Cómo editar contenidos sin programar
+
+El proyecto fue diseñado de manera modular para que una persona que no programa pueda modificar o agregar contenidos fácilmente editando archivos específicos:
+
+| ¿Qué querés cambiar? | Archivo a editar | Descripción |
+|---|---|---|
+| **Textos de la app** | `src/copy.ts` | Todos los textos, títulos, botones, explicaciones y frases amables en español rioplatense. |
+| **Micro-desafíos** | `src/challenges.ts` | Banco de pausas: títulos, duraciones en minutos, pasos a seguir, categorías y notas de cuidado. |
+| **Objetos del jardín** | `src/catalog.ts` | Catálogo de hongos, plantas, visitantes y decoraciones: nombres, categorías y descripciones. |
+| **Teléfonos y ayuda** | `src/resources.ts` | Líneas telefónicas de apoyo, teléfonos gratuitos oficiales (ej. Línea 135) y recursos de zona. |
+| **Colores oficiales** | `src/palette/colors.ts` y `src/palette/variables.css` | Definición de los 12 tonos de la paleta. (Requiere no modificar tokens sin consenso). |
+
+---
+
 ## Principios del proyecto
 
 Ver `AGENTS.md` y `design.md` en la raíz del proyecto.

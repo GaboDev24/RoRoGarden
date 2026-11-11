@@ -394,4 +394,98 @@ Criterios de aceptación
 - Los tests pasan (npm test).
 - Resumen final de 5 líneas máximo: qué hiciste, supuestos tomados, umbrales usados y reglas de Hallmark ignoradas (si hubo).
 
-No hagas todavía: cuentas o sincronización, Web Push o cualquier servidor, análisis del texto libre, estadísticas o gráficos de tendencia, compartir el resumen, exportar informes para un profesional, notificaciones nativas, chat o IA dentro de la app.
+ETAPA 6: Pulido, primera vez, publicación y prueba con la usuaria
+
+Contexto
+Seguimos el proyecto de las etapas 1 a 5. Leé primero AGENTS.md y design.md: todos sus principios (nunca castiga, sin contadores ni métricas de culpa, todo opcional, privacidad total, voz rioplatense, paleta única) siguen vigentes y mandan sobre cualquier decisión de esta etapa. Usá las skills instaladas que apliquen (game-ui-ux, save-systems, hallmark). Hallmark se usa con las reglas de design.md (modo custom, sin fotos, sin secciones de landing, piso de calidad obligatorio, reglas ignoradas anotadas con motivo). Si algo es ambiguo, anotá tu supuesto en una línea y seguí.
+
+Objetivo
+Dejar la app lista para que la maestra la use de verdad en su celular: primera experiencia cuidada, instalable, estable, accesible, rápida, sin sorpresas con sus datos, publicable y con guías claras. NO se agregan funciones nuevas. Si ves algo que mejorar fuera de esta lista, anotalo en NOTAS.md y no lo implementes.
+
+Reglas innegociables de esta etapa
+- Cero servicios de terceros en ejecución: sin analytics, sin telemetría, sin reporte remoto de errores, sin fuentes ni librerías desde CDN. Todo se sirve desde el mismo origen.
+- Los datos de la usuaria nunca se pierden por una actualización de la app.
+- Ninguna pantalla nueva pide permisos (notificaciones, ubicación, etc.).
+- La app no bloquea la orientación de la pantalla.
+
+Tareas (solo esto)
+
+1. Primera vez (#/bienvenida)
+   - Se muestra una sola vez, con un máximo de 3 pantallas, y se puede saltar en cada paso: (a) qué es, en una frase cálida; (b) privacidad: "Tus datos viven solo en este celular." sin superlativos de seguridad ni promesas absolutas; (c) todo es opcional, con la posibilidad (opcional) de ponerle nombre a su sapo, y una frase amable aclarando que la app no es terapia ni reemplaza a un profesional.
+   - Ninguna pregunta obligatoria. Al terminar, va al jardín. Se puede volver a ver desde Ajustes ("Ver la bienvenida").
+
+2. Instalación
+   - Manifest completo: name, short_name, description en español, lang es-AR, start_url, scope, display standalone, theme_color y background_color tomados de la paleta, íconos 192 y 512 (propósito "any") y 512 "maskable", apple-touch-icon de 180, y shortcuts (Check-in, Una pausa, Cerrar el día).
+   - Ícono: el sapo en pixel art, generado por un script reproducible (scripts/make-icons) a partir del sprite existente, con fondo de la paleta y margen seguro para el recorte maskable. Sin degradados.
+   - Pantalla #/instalar, accesible desde Ajustes, con pasos claros para Android (Chrome) e iPhone (Safari: Compartir > Agregar a pantalla de inicio). Si la app ya está instalada (display-mode: standalone / navigator.standalone), mostrar "Ya está instalada". En Android, si existe el evento beforeinstallprompt, un botón "Instalar" solo dentro de esa pantalla. Nunca banners ni pedidos de instalar por iniciativa propia.
+   - Una frase simple sobre por qué conviene instalar (funciona como una app y sus datos quedan mejor guardados), sin alarmar.
+   - Pedir almacenamiento persistente (navigator.storage.persist()) la primera vez que se guarda algo, en silencio. Si falla, seguir con normalidad.
+
+3. Actualizaciones seguras
+   - Service worker con precache de todo lo necesario y estrategia "avisar, no forzar": cuando hay una versión nueva, una tarjeta suave ("Hay una versión nueva. Actualizar cuando quieras.") en Ajustes y en el jardín. Nunca recargar sola, y nunca durante una pausa, una respiración o mientras escribe.
+   - Versión visible en #/acerca.
+   - Verificar que actualizar desde la versión anterior (el tag de git de la etapa 5) conserva TODOS los datos: crear datos de prueba con la versión anterior, actualizar y comprobar. Automatizarlo si es posible; si no, dejarlo como paso documentado en QA.md.
+   - Manejo amable de almacenamiento lleno, bloqueado o en modo privado: mensaje claro y sugerencia de exportar una copia.
+
+4. Estabilidad y errores
+   - Captura global de errores con una pantalla amable ("Algo no salió bien. Tus datos están a salvo.") con botones "Volver al jardín" y "Recargar". Nunca pantalla en blanco. No enviar nada a ningún lado; registrar solo en consola.
+   - Ruta desconocida: ir al jardín.
+   - Quitar todo console.log de depuración y código muerto. Excluir /sprites y cualquier herramienta de desarrollo del build de producción.
+   - Limpiar listeners, temporizadores y animaciones al cambiar de ruta. Verificar con una sesión larga en el jardín animado que la memoria no crece de forma sostenida.
+
+5. Rendimiento
+   - Presupuesto: JavaScript inicial de hasta 150 KB comprimido (si se excede, justificarlo). Sin dependencias grandes sin uso ni assets duplicados. Carga diferida de las rutas pesadas (jardín, respiración) si conviene.
+   - Lighthouse en móvil emulado, con la configuración por defecto, sobre la pantalla de inicio y el jardín: Desempeño ≥ 90, Accesibilidad ≥ 95, Buenas prácticas ≥ 95. Informar los números reales, aunque no se alcancen. La instalabilidad se verifica con el panel Application de Chrome DevTools.
+   - Reportar los fps de la escena en un perfil de CPU reducida; si bajan de 24, simplificar.
+
+6. Accesibilidad (cierre)
+   - Al cambiar de ruta, mover el foco al encabezado principal y actualizar document.title. Sin trampas de foco.
+   - Tests automáticos con Playwright + axe-core en todas las rutas, con y sin movimiento reducido: cero violaciones serias o críticas.
+   - Texto al 200% y fuente grande del sistema: nada se corta ni se superpone. Modo de contraste forzado (forced-colors): los controles siguen siendo visibles. Orientación horizontal usable. Objetivos táctiles de al menos 48px.
+   - Crear A11Y-CHECKLIST.md para que una persona la recorra con TalkBack (Android) y VoiceOver (iPhone): flujos concretos (check-in, diario, pausa, respiración, acomodar el jardín, Mi semana, ayuda) y qué se debería escuchar en cada uno. Dejar claro que esa prueba la tiene que hacer una persona, no el agente.
+
+7. Seguridad y privacidad
+   - Content-Security-Policy estricta (sin scripts en línea, solo mismo origen; img-src con data: y blob:), aplicada con un archivo _headers donde el hosting lo permita y como <meta> equivalente donde no. Más Referrer-Policy: no-referrer y una Permissions-Policy restrictiva (sin cámara, micrófono ni geolocalización).
+   - Fuentes propias y locales. Si hay una tipografía pixel, verificar que su licencia permita la redistribución (por ejemplo OFL), incluir el archivo de licencia en el repo y registrarla en los créditos.
+   - Correr npm audit, fijar dependencias con lockfile y generar LICENSES-THIRD-PARTY.md con las licencias de todas las dependencias (producción y desarrollo), indicando si alguna es problemática para distribuir.
+   - Pantalla #/acerca ("Acerca de y privacidad"): versión; qué se guarda y dónde (solo en este dispositivo, la app no envía sus registros a ningún lado); aclarar con honestidad que el servicio de alojamiento puede registrar las visitas a la página como cualquier sitio web, sin recibir sus registros; no es terapia ni consejo médico; créditos (arte original hecho para esta app, tipografías y licencias).
+   - Enlace opcional de comentarios: constante FEEDBACK_URL en un archivo de configuración. Por defecto vacía, y entonces el enlace no aparece. Si se completa, abre un mailto o un enlace sin adjuntar ningún dato de la usuaria.
+   - Verificar que la carpeta referencias/ NO esté en el repositorio ni en el build: agregarla a .gitignore y, si ya fue commiteada alguna vez, avisarme para sacarla del historial ANTES de publicar. Verificar también que ningún asset del build derive directamente de esas ilustraciones.
+   - No agregar una licencia al repositorio: dejar una nota en NOTAS.md para que el autor la elija.
+
+8. Publicación
+   - Build de producción reproducible (npm run build) con base configurable. Tiene que funcionar bajo una subruta (por ejemplo /nombre-del-repo/) y en la raíz de un dominio. Verificar que service worker, manifest, íconos y rutas funcionan en ambos casos.
+   - Documentar en DEPLOY.md, paso a paso y para alguien que no programa: GitHub Pages con GitHub Actions (por defecto, con el workflow incluido) y una alternativa en Cloudflare Pages o Netlify. Verificá los pasos y las condiciones del plan gratuito en la documentación oficial vigente antes de escribirlos y anotá la fecha de consulta. Aclarar que con GitHub Pages el repositorio suele ser público (por eso lo de referencias/) y que no permite poner headers (por eso la CSP en meta).
+   - NO crear cuentas ni publicar nada: dejame el workflow y la guía listos, el despliegue lo hago yo.
+   - POSTDEPLOY.md: lista corta para después de publicar (abrir la URL, instalar en el celular, probar en modo avión, probar una actualización).
+
+9. Guías y prueba con la usuaria
+   - GUIA-MAESTRA.md: una página en español rioplatense, con lenguaje sencillo y sin tecnicismos: abrir el enlace, instalar (Android e iPhone), para qué sirve cada parte, cómo hacer una copia de sus datos (exportar), cómo pasarla a otro celular (importar), qué hacer si se borran los datos del navegador y cómo desactivar lo que no quiera usar.
+   - PRUEBA.md para quien la acompañe: 6 tareas simples para observar sin ayudarla ("encontrá cómo hacer una pausa de 1 minuto", "escribí cómo llegás hoy", "acomodá un hongo en el jardín", "buscá dónde está la ayuda", "poné un recordatorio para el jueves", "hacé una copia de tus datos"), preguntas abiertas para después ("¿qué te dio ganas de volver a usar?", "¿qué te molestó?", "¿alguna frase te sonó rara?", "¿algo te generó presión?") y una hoja para anotar lo observado.
+   - No agregar nada a la app para la prueba (sin modo de prueba, sin métricas).
+
+10. Calidad y documentación
+   - Diseñar con Hallmark las pantallas nuevas (bienvenida, instalar, acerca, error) y correr su revisión (audit/sloplint) sobre TODAS las pantallas de la app. Informar qué marcó y qué corregiste. Si no se puede correr la parte con navegador, decirlo y correr las estáticas.
+   - README.md de desarrollo: cómo correr, estructura, decisiones y qué archivos editar para cambiar textos, desafíos, catálogo y recursos de ayuda sin programar.
+   - CHANGELOG.md, versión 1.0.0, y NOTAS.md con ideas fuera de alcance y pendientes.
+   - Ningún color hardcodeado: todo sale de la paleta.
+
+Tests y verificación
+- E2E con Playwright (smoke): primera vez, check-in, diario, pausa, respiración, regalo del día, acomodar, Mi semana, exportar e importar, y todo con la red cortada después de la primera carga.
+- axe-core en todas las rutas.
+- Migración desde la versión anterior con datos de prueba.
+- Verificar en la pestaña Network que no hay solicitudes a otros dominios.
+- Si el entorno no permite instalar los navegadores de Playwright, decirlo y dejar los tests escritos y documentados.
+
+Criterios de aceptación
+- Instalable en Android y en iPhone, abre a pantalla completa con ícono propio y funciona sin conexión.
+- La primera vez es clara, corta, saltable y no pide permisos.
+- Actualizar no pierde datos ni interrumpe una actividad.
+- Cero solicitudes a otros dominios en ejecución.
+- Lighthouse reportado con los números reales; axe sin violaciones serias ni críticas.
+- referencias/ fuera del repositorio y del build.
+- Las guías para la maestra y para quien la acompaña están claras y sin tecnicismos.
+- Los tests pasan (npm test y los e2e).
+- Resumen final de 8 líneas como máximo: qué hiciste, números de Lighthouse, qué queda pendiente de prueba humana (lectoras de pantalla, dispositivos reales, despliegue) y reglas de Hallmark ignoradas (si hubo).
+
+No hagas: funciones nuevas, cuentas, sincronización, analytics, notificaciones push, reporte remoto de errores, monetización ni compartir en redes.

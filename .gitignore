@@ -28,6 +28,9 @@ lerna-debug.log*
 .DS_Store
 Thumbs.db
 
+# Referencias visuales privadas (no distribuir)
+referencias/
+
 # Editores e IDEs
 .vscode/*
 !.vscode/extensions.json
