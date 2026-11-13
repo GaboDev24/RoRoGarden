@@ -31,6 +31,9 @@ jobs:
           node-version: 20
           cache: 'npm'
 
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
       - name: Instalar dependencias
         run: npm ci
 
@@ -43,9 +46,6 @@ jobs:
         env:
           VITE_BASE: './'
 
-      - name: Configurar GitHub Pages
-        uses: actions/configure-pages@v4
-
       - name: Subir artefacto compilado
         uses: actions/upload-pages-artifact@v3
         with:
@@ -54,4 +54,3 @@ jobs:
       - name: Desplegar en GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
