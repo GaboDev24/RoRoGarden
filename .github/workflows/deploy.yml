@@ -31,11 +31,6 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Configurar GitHub Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
       - name: Instalar dependencias
         run: npm ci
 
@@ -43,7 +38,7 @@ jobs:
         run: npm test
 
       - name: Compilar para producción
-        # Usar la base relativa para que funcione tanto en subrutas de GitHub Pages como en dominios propios
+        # Base relativa './' para que funcione en cualquier ruta de GitHub Pages
         run: npm run build
         env:
           VITE_BASE: './'
