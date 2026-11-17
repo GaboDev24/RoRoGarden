@@ -7,9 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: 'pages'
@@ -17,9 +15,6 @@ concurrency:
 
 jobs:
   build-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Clonar repositorio
@@ -28,7 +23,7 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Instalar dependencias
@@ -38,16 +33,13 @@ jobs:
         run: npm test
 
       - name: Compilar para producción
-        # Base relativa './' para que funcione en cualquier ruta de GitHub Pages
+        # Base relativa './' para que funcione bajo cualquier subruta
         run: npm run build
         env:
           VITE_BASE: './'
 
-      - name: Subir artefacto compilado
-        uses: actions/upload-pages-artifact@v3
+      - name: Desplegar a rama gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: './dist'
-
-      - name: Desplegar en GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist

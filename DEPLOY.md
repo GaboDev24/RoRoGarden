@@ -26,15 +26,14 @@ El repositorio ya incluye el archivo de automatización listo en `.github/workfl
 - **Dominio:** Te da una dirección gratuita tipo `https://tu-usuario.github.io/RoRoGarden/`.
 
 ### Pasos para Activar:
-1. Subí tu proyecto a un repositorio en **GitHub**.
-2. En GitHub, entrá a la pestaña **Settings** (Configuración) de tu repositorio.
-3. En el menú de la izquierda, hacé clic en **Pages**.
-4. En la sección **Build and deployment** (Compilación y despliegue):
-   - En **Source**, seleccioná **GitHub Actions** (en lugar de "Deploy from a branch").
-5. Hacé clic en la pestaña **Actions** arriba: verás el proceso llamado **"Despliegue en GitHub Pages"**.
-6. Esperá unos 2 minutos a que termine con un tilde verde (✓).
-7. Al hacer clic en el proceso terminado, verás el enlace público de tu app.
-8. ¡Listo! Ya podés compartir ese enlace con la maestra o abrirlo en el celular.
+1. Subí tu proyecto a tu repositorio en **GitHub**.
+2. El workflow de GitHub Actions compilará la app y creará automáticamente la rama **`gh-pages`**.
+3. En GitHub, entrá a la pestaña **Settings** (Configuración) de tu repositorio.
+4. En el menú de la izquierda, hacé clic en **Pages**.
+5. En la sección **Build and deployment** (Compilación y despliegue):
+   - **Source:** Dejá seleccionado **Deploy from a branch**.
+   - **Branch:** Elegí la rama **`gh-pages`** y la carpeta **`/ (root)`**, luego hacé clic en **Save**.
+6. En 1 minuto tu app estará publicada en `https://tu-usuario.github.io/RoRoGarden/`.
 
 ---
 
