@@ -786,7 +786,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     sprite: SPRITE_VIS_DORADO,
     gridWidth: 1,
     gridHeight: 1,
-    terrain: 'tierra',
+    terrain: 'ambos',
     behavior: 'parpadear',
   },
   {
@@ -808,7 +808,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     sprite: SPRITE_VIS_ABUELO,
     gridWidth: 1,
     gridHeight: 1,
-    terrain: 'tierra',
+    terrain: 'ambos',
     behavior: 'dormir',
   },
   {
@@ -819,7 +819,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     sprite: SPRITE_VIS_BEBE,
     gridWidth: 1,
     gridHeight: 1,
-    terrain: 'agua',
+    terrain: 'ambos',
     behavior: 'nadar',
   },
 
@@ -854,7 +854,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     sprite: SPRITE_HONGO_CREMA,
     gridWidth: 1,
     gridHeight: 1,
-    terrain: 'tierra',
+    terrain: 'ambos',
     behavior: 'quieto',
   },
   {
@@ -865,7 +865,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     sprite: SPRITE_HONGO_MUSGO,
     gridWidth: 1,
     gridHeight: 1,
-    terrain: 'tierra',
+    terrain: 'ambos',
     behavior: 'quieto',
   },
 
@@ -889,7 +889,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     sprite: SPRITE_HELECHO,
     gridWidth: 1,
     gridHeight: 1,
-    terrain: 'tierra',
+    terrain: 'ambos',
     behavior: 'quieto',
   },
   {
@@ -911,7 +911,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     sprite: SPRITE_TREBOL,
     gridWidth: 1,
     gridHeight: 1,
-    terrain: 'tierra',
+    terrain: 'ambos',
     behavior: 'quieto',
   },
   {
@@ -922,7 +922,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     sprite: SPRITE_BROTE,
     gridWidth: 1,
     gridHeight: 1,
-    terrain: 'tierra',
+    terrain: 'ambos',
     behavior: 'quieto',
   },
 
@@ -1027,7 +1027,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     sprite: SPRITE_FAROL,
     gridWidth: 1,
     gridHeight: 1,
-    terrain: 'tierra',
+    terrain: 'ambos',
     behavior: 'parpadear',
   },
   {
@@ -1038,7 +1038,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     sprite: SPRITE_TRONQUITO,
     gridWidth: 1,
     gridHeight: 1,
-    terrain: 'tierra',
+    terrain: 'ambos',
     behavior: 'quieto',
   },
   {
@@ -1049,7 +1049,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     sprite: SPRITE_CARTELITO,
     gridWidth: 1,
     gridHeight: 1,
-    terrain: 'tierra',
+    terrain: 'ambos',
     behavior: 'quieto',
   },
   {

@@ -252,27 +252,51 @@ export function renderJardin(container: HTMLElement): () => void {
 
     .frog-speech-bubble {
       position: absolute;
-      top: 20%;
+      top: 22%;
       left: 50%;
       transform: translate(-50%, -50%);
       background-color: var(--color-crema);
       border: 2px solid var(--color-tinta);
       border-radius: var(--border-radius-sm);
-      padding: 4px 10px;
-      font-family: var(--font-pixel);
-      font-size: 0.625rem;
+      padding: 6px 14px;
+      font-family: var(--font-ui);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
       color: var(--color-tinta);
-      box-shadow: 2px 2px 0 var(--color-bosque);
-      pointer-events: none;
-      z-index: 20;
-      animation: floatSpeech 1.5s ease-out forwards;
+      box-shadow: 0 4px 14px rgba(43, 58, 66, 0.28);
+      pointer-events: auto;
+      cursor: pointer;
+      z-index: 30;
+      white-space: nowrap;
+      text-align: center;
+      animation: floatSpeech 4s ease-out forwards;
+      user-select: none;
+    }
+
+    .frog-speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 7px 6px 0 6px;
+      border-style: solid;
+      border-color: var(--color-tinta) transparent transparent transparent;
     }
 
     @keyframes floatSpeech {
-      0% { opacity: 0; transform: translate(-50%, -40%); }
-      20% { opacity: 1; transform: translate(-50%, -50%); }
-      80% { opacity: 1; transform: translate(-50%, -54%); }
-      100% { opacity: 0; transform: translate(-50%, -60%); }
+      0% { opacity: 0; transform: translate(-50%, -35%) scale(0.9); }
+      8% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -58%) scale(0.95); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .frog-speech-bubble {
+        animation: none;
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
     }
 
     /* Grilla de colocación (Modo Acomodar) */
@@ -300,7 +324,7 @@ export function renderJardin(container: HTMLElement): () => void {
       padding: 0;
       box-sizing: border-box;
       position: relative;
-      transition: background-color var(--transition-fast);
+      transition: background-color var(--transition-fast), border-color var(--transition-fast);
       width: 100%;
       height: 100%;
     }
@@ -311,10 +335,40 @@ export function renderJardin(container: HTMLElement): () => void {
       outline-offset: -2px;
     }
 
+    .grid-cell-btn.cell-compatible {
+      background-color: rgba(142, 209, 207, 0.4);
+      border: 2px dashed var(--color-menta);
+      animation: pulseCell 2s infinite ease-in-out;
+    }
+
+    .grid-cell-btn.cell-incompatible {
+      opacity: 0.25;
+      cursor: not-allowed;
+    }
+
+    @keyframes pulseCell {
+      0%, 100% { background-color: rgba(142, 209, 207, 0.3); }
+      50% { background-color: rgba(142, 209, 207, 0.6); }
+    }
+
     .grid-cell-btn.center-frog {
       background-color: rgba(63, 111, 94, 0.45);
       border: 1px solid var(--color-bosque);
       cursor: default;
+    }
+
+    .cell-placed-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-crema);
+      background: var(--color-bosque);
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
 
     .acomodar-panel {
@@ -681,10 +735,16 @@ export function renderJardin(container: HTMLElement): () => void {
 
   // Mensaje flotante al tocar al sapo
   let speechEl: HTMLElement | null = null
+  let speechTimer: any = null
   let frogHopOffset = 0
   let frogHopTimer: any = null
+  let lastFrogTapTime = 0
 
   const triggerFrogTap = () => {
+    const now = performance.now()
+    if (now - lastFrogTapTime < 250) return
+    lastFrogTapTime = now
+
     playChime()
     // Animación de salto chiquito
     frogHopOffset = -10
@@ -693,17 +753,41 @@ export function renderJardin(container: HTMLElement): () => void {
       frogHopOffset = 0
     }, 280)
 
-    // Mostrar frase corta
-    if (speechEl) speechEl.remove()
+    // Limpiar temporizador previo para evitar que se borre antes de tiempo
+    if (speechTimer) {
+      clearTimeout(speechTimer)
+      speechTimer = null
+    }
+    if (speechEl) {
+      speechEl.remove()
+      speechEl = null
+    }
+
+    // Mostrar frase corta y mantenerla 4 segundos completos
     const phrase = copy.jardin.frogTap[Math.floor(Math.random() * copy.jardin.frogTap.length)]
     speechEl = document.createElement('div')
     speechEl.className = 'frog-speech-bubble'
     speechEl.textContent = phrase
-    stageWrapper.appendChild(speechEl)
-    setTimeout(() => {
+    speechEl.title = 'Tocá para cerrar'
+
+    // Permitir cerrarlo tocando el cartel
+    speechEl.addEventListener('click', (e) => {
+      e.stopPropagation()
+      if (speechTimer) {
+        clearTimeout(speechTimer)
+        speechTimer = null
+      }
       speechEl?.remove()
       speechEl = null
-    }, 1500)
+    })
+
+    canvasContainer.appendChild(speechEl)
+
+    speechTimer = setTimeout(() => {
+      speechEl?.remove()
+      speechEl = null
+      speechTimer = null
+    }, 4000)
   }
 
   canvasContainer.addEventListener('click', (e) => {
@@ -712,9 +796,14 @@ export function renderJardin(container: HTMLElement): () => void {
     const rect = canvasContainer.getBoundingClientRect()
     const clickX = e.clientX - rect.left
     const clickY = e.clientY - rect.top
-    const frogCenterX = 140
-    const frogCenterY = 130
-    if (Math.abs(clickX - frogCenterX) < 42 && Math.abs(clickY - frogCenterY) < 42) {
+    const scaleX = (SCENE_W * 2) / rect.width
+    const scaleY = (SCENE_H * 2) / rect.height
+    const canvasClickX = clickX * scaleX
+    const canvasClickY = clickY * scaleY
+
+    const frogCenterX = 136
+    const frogCenterY = 124
+    if (Math.hypot(canvasClickX - frogCenterX, canvasClickY - frogCenterY) < 55) {
       triggerFrogTap()
     }
   })
@@ -748,38 +837,130 @@ export function renderJardin(container: HTMLElement): () => void {
   const canAnimate = gardenState.gardenAnimationsEnabled && !reducedMotion
 
   const renderScene = (timestamp: number) => {
-    // Fondo de cielo
+    // 1. Cielo con degradé pixel art suave
     ctx.fillStyle = world.skyColors.top
-    ctx.fillRect(0, 0, SCENE_W * 2, 40)
-    ctx.fillStyle = world.skyColors.bottom
-    ctx.fillRect(0, 40, SCENE_W * 2, 30)
+    ctx.fillRect(0, 0, SCENE_W * 2, 38)
 
-    // Si es de noche, dibujar luna menguante
-    if (world.isNight) {
-      drawSprite(ctx, instMoon, 210, 10, 2)
-      // Estrellitas sutiles
-      ctx.fillStyle = palette.crema
-      ctx.fillRect(40, 16, 2, 2)
-      ctx.fillRect(90, 28, 2, 2)
-      ctx.fillRect(160, 20, 2, 2)
+    // Franja de dithering entre cielo superior e inferior
+    ctx.fillStyle = world.skyColors.bottom
+    ctx.fillRect(0, 38, SCENE_W * 2, 16)
+    for (let x = 0; x < SCENE_W * 2; x += 4) {
+      ctx.fillRect(x + (x % 8 === 0 ? 0 : 2), 36, 2, 2)
     }
 
-    // Banda de tierra alta (fila 1 de la grilla)
-    ctx.fillStyle = world.foliageColor
-    ctx.fillRect(0, 50, SCENE_W * 2, 34)
+    // Luna y estrellas de noche, o nubes serenas de día
+    if (world.isNight) {
+      drawSprite(ctx, instMoon, 210, 8, 2)
+      // Estrellitas sutiles con brillo armónico
+      const t = timestamp * 0.003
+      const stars = [
+        { x: 34, y: 12, s: 2, phase: 0 },
+        { x: 68, y: 22, s: 1, phase: 1.2 },
+        { x: 110, y: 15, s: 2, phase: 2.4 },
+        { x: 154, y: 10, s: 1, phase: 3.6 },
+        { x: 178, y: 24, s: 2, phase: 0.8 },
+        { x: 260, y: 18, s: 1, phase: 4.8 },
+      ]
+      for (const st of stars) {
+        const glow = Math.sin(t + st.phase)
+        ctx.fillStyle = glow > 0.3 ? palette.crema : palette.azulNiebla
+        ctx.fillRect(st.x, st.y, st.s, st.s)
+        if (st.s > 1 && glow > 0.7) {
+          ctx.fillRect(st.x - 1, st.y, 1, 1)
+          ctx.fillRect(st.x + st.s, st.y, 1, 1)
+        }
+      }
+    } else {
+      // De día o atardecer: nubecitas pixeladas suaves
+      ctx.fillStyle = world.skyColors.bottom === palette.azulNiebla ? palette.crema : palette.menta
+      ctx.fillRect(28, 16, 20, 6)
+      ctx.fillRect(32, 12, 12, 4)
+      ctx.fillRect(160, 22, 24, 6)
+      ctx.fillRect(166, 18, 14, 4)
+    }
 
-    // Estanque de agua (filas 2 y 3)
-    ctx.fillStyle = world.waterColor
+    // 2. Banda de tierra alta / bosque de fondo (fila 1 de la grilla)
+    ctx.fillStyle = palette.bosque
+    ctx.fillRect(0, 50, SCENE_W * 2, 4)
+    for (let bx = 0; bx < SCENE_W * 2; bx += 18) {
+      ctx.fillRect(bx + 2, 46, 14, 6)
+      ctx.fillRect(bx + 4, 44, 10, 3)
+    }
+    ctx.fillStyle = world.foliageColor
+    ctx.fillRect(0, 52, SCENE_W * 2, 34)
+    // Detallitos de flores silvestres en la tierra alta
+    ctx.fillStyle = palette.crema
+    ctx.fillRect(24, 62, 2, 2)
+    ctx.fillRect(96, 68, 2, 2)
+    ctx.fillRect(180, 60, 2, 2)
+    ctx.fillRect(244, 64, 2, 2)
+    ctx.fillStyle = palette.acento
+    ctx.fillRect(58, 66, 2, 2)
+    ctx.fillRect(138, 58, 2, 2)
+    ctx.fillRect(212, 70, 2, 2)
+
+    // 3. Estanque de agua (filas 2 y 3)
+    // Borde exterior ribereño
+    ctx.fillStyle = palette.bosque
     ctx.beginPath()
-    ctx.ellipse(SCENE_W, 140, 130, 46, 0, 0, Math.PI * 2)
+    ctx.ellipse(SCENE_W, 137, 133, 49, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = palette.musgo
+    ctx.beginPath()
+    ctx.ellipse(SCENE_W, 137, 130, 46, 0, 0, Math.PI * 2)
     ctx.fill()
 
-    // Banda de tierra baja / primer plano (fila 4)
-    ctx.fillStyle = world.foliageColor
-    ctx.fillRect(0, 185, SCENE_W * 2, 35)
+    // Masa de agua principal
+    ctx.fillStyle = world.waterColor
+    ctx.beginPath()
+    ctx.ellipse(SCENE_W, 137, 126, 43, 0, 0, Math.PI * 2)
+    ctx.fill()
 
-    // 1. Dibujar decoraciones colocadas en la grilla
-    // Mapeo de celdas 5x5 a coordenadas físicas en canvas (280x220)
+    // Suaves reflejos y ondas de agua animadas
+    const waveT = timestamp * 0.002
+    ctx.fillStyle = palette.turquesa
+    ctx.fillRect(40 + Math.sin(waveT) * 4, 120, 22, 2)
+    ctx.fillRect(180 + Math.sin(waveT + 1) * 5, 126, 26, 2)
+    ctx.fillRect(60 + Math.sin(waveT + 2) * 4, 150, 18, 2)
+    ctx.fillRect(195 + Math.sin(waveT + 3) * 5, 156, 24, 2)
+
+    ctx.fillStyle = palette.celesteAgua
+    ctx.fillRect(90 + Math.cos(waveT) * 3, 114, 16, 1)
+    ctx.fillRect(150 + Math.cos(waveT + 2) * 3, 162, 20, 1)
+
+    // Onda concéntrica tenue bajo el nenúfar
+    ctx.strokeStyle = palette.turquesa
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.ellipse(SCENE_W, 152, 38 + Math.sin(waveT * 1.5) * 2, 10, 0, 0, Math.PI * 2)
+    ctx.stroke()
+
+    // 4. Banda de tierra baja / primer plano (fila 4)
+    ctx.fillStyle = world.foliageColor
+    ctx.fillRect(0, 184, SCENE_W * 2, 36)
+
+    // Briznas de hierba silvestre en el borde inferior del estanque
+    ctx.fillStyle = palette.bosque
+    for (let gx = 0; gx < SCENE_W * 2; gx += 8) {
+      ctx.fillRect(gx + 2, 182, 3, 4)
+      ctx.fillRect(gx + 4, 180, 2, 4)
+    }
+    ctx.fillStyle = palette.salvia
+    for (let gx = 0; gx < SCENE_W * 2; gx += 12) {
+      ctx.fillRect(gx + 1, 183, 2, 3)
+    }
+
+    // Piedritas lisas en los rincones
+    ctx.fillStyle = palette.azulNiebla
+    ctx.fillRect(16, 204, 6, 4)
+    ctx.fillRect(18, 202, 4, 2)
+    ctx.fillRect(256, 206, 7, 4)
+    ctx.fillRect(258, 204, 4, 2)
+    ctx.fillStyle = palette.tinta
+    ctx.fillRect(16, 208, 6, 1)
+    ctx.fillRect(256, 210, 7, 1)
+
+    // 5. Dibujar decoraciones colocadas en la grilla
     const CELL_W = (SCENE_W * 2) / GARDEN_GRID_COLS // 56px
     const CELL_H = (SCENE_H * 2) / GARDEN_GRID_ROWS // 44px
 
@@ -793,7 +974,7 @@ export function renderJardin(container: HTMLElement): () => void {
       }
     }
 
-    // 2. Nenúfar y Sapo Protagonista (en el centro: x=2, y=3)
+    // 6. Nenúfar y Sapo Protagonista (en el centro: x=2, y=3)
     const padX = Math.round(2 * CELL_W + (CELL_W - 56) / 2)
     const padY = Math.round(3 * CELL_H + (CELL_H - 24) / 2)
     drawSprite(ctx, instPad, padX, padY, 2)
@@ -847,6 +1028,8 @@ export function renderJardin(container: HTMLElement): () => void {
 
   const updateGridOverlay = () => {
     gridOverlay.innerHTML = ''
+    const selectedItem = selectedCatalogItemId ? CATALOG_ITEMS_BY_ID.get(selectedCatalogItemId) : null
+
     for (let r = 0; r < GARDEN_GRID_ROWS; r++) {
       for (let c = 0; c < GARDEN_GRID_COLS; c++) {
         const cellBtn = document.createElement('button')
@@ -868,9 +1051,8 @@ export function renderJardin(container: HTMLElement): () => void {
         const placed = gardenState.placedDecorations.find((p) => p.x === c && p.y === r)
         if (placed) {
           const item = CATALOG_ITEMS_BY_ID.get(placed.catalogId)
-          if (item) {
-            cellBtn.innerHTML = `<span style="font-size: 10px; font-weight: bold; color: var(--color-tinta);">${item.name.slice(0, 3)}</span>`
-          }
+          cellBtn.title = `${item?.name || 'Objeto'} (tocá para guardar en la colección)`
+          cellBtn.innerHTML = `<span class="cell-placed-badge" title="Tocá para guardar">✓</span>`
           cellBtn.addEventListener('click', () => {
             // Quitar el objeto y devolver a la colección
             gardenState = {
@@ -884,13 +1066,32 @@ export function renderJardin(container: HTMLElement): () => void {
             renderScene(performance.now())
           })
         } else {
+          // Si hay un objeto seleccionado, indicar compatibilidad visual
+          if (selectedItem) {
+            if (isTerrainCompatible(selectedItem.terrain, terrain)) {
+              cellBtn.classList.add('cell-compatible')
+              cellBtn.title = `Colocar ${selectedItem.name} acá (${terrain})`
+            } else {
+              cellBtn.classList.add('cell-incompatible')
+            }
+          }
+
           cellBtn.addEventListener('click', () => {
             if (!selectedCatalogItemId) return
             const item = CATALOG_ITEMS_BY_ID.get(selectedCatalogItemId)
             if (!item) return
 
             if (!isTerrainCompatible(item.terrain, terrain)) {
-              alert(`Este elemento necesita terreno de tipo: ${item.terrain}`)
+              // Aviso calmo sin alert intrusivo
+              const rowTitle = acomodarPanel.querySelector<HTMLElement>('.acomodar-hint')
+              if (rowTitle) {
+                rowTitle.textContent = `🌱 ${item.name} prefiere terreno de ${item.terrain}.`
+                rowTitle.style.color = 'var(--color-acento)'
+                setTimeout(() => {
+                  rowTitle.textContent = `Tocá un casillero compatible para colocar:`
+                  rowTitle.style.color = 'var(--color-bosque)'
+                }, 2500)
+              }
               return
             }
 
@@ -922,9 +1123,10 @@ export function renderJardin(container: HTMLElement): () => void {
   const updateAcomodarPanel = () => {
     acomodarPanel.innerHTML = ''
     const rowTitle = document.createElement('span')
-    rowTitle.style.cssText = 'font-family: var(--font-pixel); font-size: 0.5625rem; color: var(--color-bosque);'
+    rowTitle.className = 'acomodar-hint'
+    rowTitle.style.cssText = 'font-family: var(--font-pixel); font-size: 0.5625rem; color: var(--color-bosque); line-height: 1.4;'
     rowTitle.textContent = selectedCatalogItemId
-      ? `Tocá un casillero compatible para colocar:`
+      ? `Tocá un casillero iluminado para colocar:`
       : copy.jardin.gridHint
     acomodarPanel.appendChild(rowTitle)
 
@@ -940,7 +1142,7 @@ export function renderJardin(container: HTMLElement): () => void {
     if (availableItems.length === 0) {
       const noneMsg = document.createElement('span')
       noneMsg.style.cssText = 'font-family: var(--font-ui); font-size: var(--font-size-xs); color: var(--color-tinta);'
-      noneMsg.textContent = 'No tenés más objetos libres. Tocá uno colocado para guardarlo.'
+      noneMsg.textContent = 'No tenés más objetos libres. Tocá uno colocado con ✓ para guardarlo.'
       itemsRow.appendChild(noneMsg)
     } else {
       for (const item of availableItems) {
@@ -954,6 +1156,7 @@ export function renderJardin(container: HTMLElement): () => void {
 
         thumb.addEventListener('click', () => {
           selectedCatalogItemId = selectedCatalogItemId === item.id ? null : item.id
+          updateGridOverlay()
           updateAcomodarPanel()
         })
         itemsRow.appendChild(thumb)
