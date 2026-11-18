@@ -59,7 +59,26 @@ Cloudflare Pages es muy rápido, tiene servidores en todo el mundo y lee automá
 
 ---
 
-## Opción 3: Netlify
+## Opción 3: Vercel (La más rápida y directa)
+
+Vercel detecta automáticamente proyectos Vite, no requiere configurar ramas ni permisos en GitHub y lee directamente la configuración y cabeceras de seguridad en `vercel.json`.
+
+### Condiciones del Plan Gratuito (Vercel Hobby)
+- **Costo:** $0 / mes.
+- **Límite:** 100 GB de ancho de banda al mes, despliegues ilimitados y certificados SSL automáticos.
+- **Dominio:** Te da una dirección gratuita tipo `https://tu-proyecto.vercel.app` o podés asignarle un dominio propio.
+
+### Pasos para Activar (menos de 1 minuto):
+1. Entrá a [vercel.com](https://vercel.com) e iniciá sesión con tu cuenta de **GitHub**.
+2. Hacé clic en **Add New...** > **Project**.
+3. En la lista de repositorios, buscá **`RoRoGarden`** y hacé clic en **Import**.
+4. Vercel detectará automáticamente que es un proyecto **Vite**.
+5. Hacé clic en el botón azul **Deploy**.
+6. En 30 segundos tu app estará publicada y funcionando.
+
+---
+
+## Opción 4: Netlify
 
 Netlify también lee automáticamente el archivo `public/_headers` y es muy sencillo de configurar.
 
