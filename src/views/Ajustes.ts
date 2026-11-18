@@ -16,6 +16,15 @@ import {
   saveGardenState,
   clearGardenState,
 } from '../storage'
+import {
+  pushToCloud,
+  pullFromCloud,
+  checkCloudHealth,
+  getCloudUserId,
+  setCloudUserId,
+  isAutoSyncEnabled,
+  setAutoSyncEnabled,
+} from '../storage/cloud'
 
 /**
  * Vista #/ajustes — Ajustes y Respaldo
@@ -840,6 +849,172 @@ export function renderAjustes(container: HTMLElement): () => void {
   importGroup.appendChild(impBtn)
   importGroup.appendChild(fileInput)
 
+  // ── 3.5. Copia en la nube (SpiderWeb / Vercel) ──
+  const cloudGroup = document.createElement('div')
+  cloudGroup.className = 'settings-group'
+
+  const cloudTitle = document.createElement('h2')
+  cloudTitle.className = 'group-title'
+  cloudTitle.textContent = 'Copia en la nube'
+
+  const cloudDesc = document.createElement('p')
+  cloudDesc.className = 'group-desc'
+  cloudDesc.textContent =
+    'Podés respaldar tus datos en tu base de datos segura (SpiderWeb Arg). RoRoGarden sigue funcionando offline y guardando todo en tu dispositivo.'
+
+  // ID de sincronización
+  const userIdRow = document.createElement('div')
+  userIdRow.style.cssText =
+    'display: flex; flex-direction: column; gap: var(--space-xs); margin-top: var(--space-xs);'
+
+  const userIdLabel = document.createElement('span')
+  userIdLabel.className = 'group-desc'
+  userIdLabel.style.fontWeight = 'bold'
+  userIdLabel.textContent = 'Tu clave de sincronización:'
+
+  const userIdInputGroup = document.createElement('div')
+  userIdInputGroup.style.cssText = 'display: flex; gap: var(--space-xs);'
+
+  const userIdInput = document.createElement('input')
+  userIdInput.type = 'text'
+  userIdInput.value = getCloudUserId()
+  userIdInput.style.cssText =
+    'flex: 1; padding: var(--space-xs); border: 2px solid var(--color-bosque); border-radius: var(--border-radius-sm); font-family: monospace; font-size: 0.85rem; background: var(--color-crema); color: var(--color-tinta);'
+  userIdInput.addEventListener('change', () => {
+    setCloudUserId(userIdInput.value)
+    showToast('Clave de sincronización actualizada')
+  })
+
+  const copyIdBtn = document.createElement('button')
+  copyIdBtn.type = 'button'
+  copyIdBtn.className = 'btn-action btn-secondary'
+  copyIdBtn.style.padding = '0 var(--space-sm)'
+  copyIdBtn.textContent = 'Copiar'
+  copyIdBtn.addEventListener('click', () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(userIdInput.value)
+      showToast('Clave copiada al portapapeles')
+    }
+  })
+
+  userIdInputGroup.appendChild(userIdInput)
+  userIdInputGroup.appendChild(copyIdBtn)
+  userIdRow.appendChild(userIdLabel)
+  userIdRow.appendChild(userIdInputGroup)
+
+  // Toggle Auto-sync
+  const autoSyncRow = document.createElement('label')
+  autoSyncRow.style.cssText =
+    'display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); cursor: pointer; min-height: var(--touch-target-min); margin-top: var(--space-xs);'
+  const autoSyncText = document.createElement('span')
+  autoSyncText.className = 'group-desc'
+  autoSyncText.style.margin = '0'
+  autoSyncText.textContent = 'Sincronizar automáticamente en segundo plano'
+  const autoSyncCheck = document.createElement('input')
+  autoSyncCheck.type = 'checkbox'
+  autoSyncCheck.style.cssText =
+    'width: 22px; height: 22px; accent-color: var(--color-bosque); cursor: pointer;'
+  autoSyncCheck.checked = isAutoSyncEnabled()
+  autoSyncCheck.addEventListener('change', () => {
+    setAutoSyncEnabled(autoSyncCheck.checked)
+    showToast('Preferencia de sincronización actualizada')
+  })
+  autoSyncRow.appendChild(autoSyncText)
+  autoSyncRow.appendChild(autoSyncCheck)
+
+  // Botones de acción Cloud
+  const cloudActionsRow = document.createElement('div')
+  cloudActionsRow.style.cssText =
+    'display: flex; flex-direction: column; gap: var(--space-xs); margin-top: var(--space-xs);'
+
+  const pushBtn = document.createElement('button')
+  pushBtn.type = 'button'
+  pushBtn.className = 'btn-action btn-primary'
+  pushBtn.textContent = 'Subir copia a la nube'
+  pushBtn.addEventListener('click', async () => {
+    pushBtn.disabled = true
+    pushBtn.textContent = 'Subiendo...'
+    const res = await pushToCloud()
+    pushBtn.disabled = false
+    pushBtn.textContent = 'Subir copia a la nube'
+    showToast(res.message)
+  })
+
+  const pullBtn = document.createElement('button')
+  pullBtn.type = 'button'
+  pullBtn.className = 'btn-action btn-secondary'
+  pullBtn.textContent = 'Descargar y fusionar desde la nube'
+  pullBtn.addEventListener('click', () => {
+    const overlay = document.createElement('div')
+    overlay.className = 'modal-overlay'
+
+    const modal = document.createElement('div')
+    modal.className = 'modal-card'
+
+    const mTitle = document.createElement('h3')
+    mTitle.className = 'modal-title'
+    mTitle.textContent = 'Recuperar de la nube'
+
+    const mDesc = document.createElement('p')
+    mDesc.className = 'modal-desc'
+    mDesc.textContent =
+      'Se descargarán los registros guardados con tu clave en la base de datos y se fusionarán con este dispositivo. ¿Querés continuar?'
+
+    const mActions = document.createElement('div')
+    mActions.className = 'modal-actions'
+
+    const cancelBtn = document.createElement('button')
+    cancelBtn.className = 'btn-action btn-secondary'
+    cancelBtn.textContent = copy.app.cancel
+    cancelBtn.addEventListener('click', () => overlay.remove())
+
+    const confirmBtn = document.createElement('button')
+    confirmBtn.className = 'btn-action btn-primary'
+    confirmBtn.textContent = 'Descargar'
+    confirmBtn.addEventListener('click', async () => {
+      overlay.remove()
+      showToast('Descargando datos...')
+      const res = await pullFromCloud()
+      showToast(res.message)
+    })
+
+    mActions.appendChild(cancelBtn)
+    mActions.appendChild(confirmBtn)
+    modal.appendChild(mTitle)
+    modal.appendChild(mDesc)
+    modal.appendChild(mActions)
+    overlay.appendChild(modal)
+    section.appendChild(overlay)
+  })
+
+  const testBtn = document.createElement('button')
+  testBtn.type = 'button'
+  testBtn.className = 'btn-action btn-secondary'
+  testBtn.style.fontSize = '0.8rem'
+  testBtn.textContent = 'Probar conexión con el servidor'
+  testBtn.addEventListener('click', async () => {
+    testBtn.disabled = true
+    testBtn.textContent = 'Comprobando...'
+    const health = await checkCloudHealth()
+    testBtn.disabled = false
+    testBtn.textContent = 'Probar conexión con el servidor'
+    if (health.available) {
+      showToast('¡Servidor conectado y listo!')
+    } else {
+      showToast(health.message)
+    }
+  })
+
+  cloudActionsRow.appendChild(pushBtn)
+  cloudActionsRow.appendChild(pullBtn)
+  cloudActionsRow.appendChild(testBtn)
+
+  cloudGroup.appendChild(cloudTitle)
+  cloudGroup.appendChild(cloudDesc)
+  cloudGroup.appendChild(userIdRow)
+  cloudGroup.appendChild(autoSyncRow)
+  cloudGroup.appendChild(cloudActionsRow)
+
   // ── 4. Borrar todo (doble confirmación) ──
   const clearGroup = document.createElement('div')
   clearGroup.className = 'settings-group'
@@ -1007,6 +1182,7 @@ export function renderAjustes(container: HTMLElement): () => void {
   section.appendChild(weekGroup)
   section.appendChild(exportGroup)
   section.appendChild(importGroup)
+  section.appendChild(cloudGroup)
   section.appendChild(clearGroup)
   section.appendChild(appGroup)
   section.appendChild(toastLabel)

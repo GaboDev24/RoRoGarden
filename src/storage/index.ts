@@ -171,6 +171,14 @@ export function saveEntry(entry: GardenEntry): StorageResult<GardenEntry> {
       memoryFallback.set(key, serialized)
     }
 
+    if (typeof document !== 'undefined') {
+      try {
+        document.dispatchEvent(new CustomEvent('roro:dataChanged'))
+      } catch {
+        // Ignorado
+      }
+    }
+
     return { success: true, data: stamped }
   } catch (err) {
     return {
@@ -354,6 +362,14 @@ export function saveGardenState(state: GardenState): StorageResult<GardenState> 
       window.localStorage.setItem(GARDEN_STATE_KEY, serialized)
     } else {
       memoryFallback.set(GARDEN_STATE_KEY, serialized)
+    }
+
+    if (typeof document !== 'undefined') {
+      try {
+        document.dispatchEvent(new CustomEvent('roro:dataChanged'))
+      } catch {
+        // Ignorado
+      }
     }
 
     return { success: true, data: toSave }

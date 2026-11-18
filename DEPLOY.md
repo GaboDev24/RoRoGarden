@@ -73,8 +73,45 @@ Vercel detecta automáticamente proyectos Vite, no requiere configurar ramas ni 
 2. Hacé clic en **Add New...** > **Project**.
 3. En la lista de repositorios, buscá **`RoRoGarden`** y hacé clic en **Import**.
 4. Vercel detectará automáticamente que es un proyecto **Vite**.
-5. Hacé clic en el botón azul **Deploy**.
-6. En 30 segundos tu app estará publicada y funcionando.
+5. *(Opcional para sincronización en la nube)* Desplegá la sección **Environment Variables** y agregá:
+   - `SPIDERWEB_API_KEY`: tu clave generada en SpiderWeb Arg.
+   - `SPIDERWEB_DB_NAME`: el nombre de la base de datos SQL creada en SpiderWeb.
+6. Hacé clic en el botón azul **Deploy**.
+7. En 30 segundos tu app estará publicada y funcionando.
+
+---
+
+## 🗄️ Base de datos en la nube (SpiderWeb Arg API) + Backend Seguro
+
+RoRoGarden incluye un backend en Node.js Serverless (`/api/sync.ts`) que resuelve las vulnerabilidades críticas de exponer claves en el cliente:
+
+1. **La API Key nunca viaja al navegador:** El cliente solo se comunica con tu propio endpoint `/api/sync`, protegiendo `SPIDERWEB_API_KEY` en el entorno seguro del servidor Vercel.
+2. **Protección contra Inyección SQL:** Todos los identificadores, tipos, fechas y datos JSON se sanitizan y validan rigurosamente con expresiones regulares antes de emitir cualquier consulta SQL a SpiderWeb.
+3. **Local-First intacto:** La aplicación sigue funcionando 100% offline en el jardín o la escuela; la sincronización es un respaldo asíncrono y transparente que nunca bloquea a la docente.
+
+### Creación de tablas en SpiderWeb
+Podés crear las tablas directamente desde el panel **Explorar** de SpiderWeb o dejando que la app las inicialice automáticamente:
+
+```sql
+CREATE TABLE IF NOT EXISTS roro_entries (
+  id VARCHAR(100) NOT NULL,
+  user_id VARCHAR(64) NOT NULL,
+  version INT NOT NULL,
+  type VARCHAR(50) NOT NULL,
+  entry_date VARCHAR(20) NOT NULL,
+  created_at VARCHAR(50) NOT NULL,
+  updated_at VARCHAR(50) NOT NULL,
+  data_json TEXT NOT NULL,
+  PRIMARY KEY (id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS roro_garden_state (
+  user_id VARCHAR(64) PRIMARY KEY,
+  version INT NOT NULL,
+  state_json TEXT NOT NULL,
+  updated_at VARCHAR(50) NOT NULL
+);
+```
 
 ---
 
