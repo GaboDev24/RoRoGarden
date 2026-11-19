@@ -412,10 +412,29 @@ export function renderJardin(container: HTMLElement): () => void {
 
     .jardin-actions {
       width: 100%;
+      max-width: 270px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: var(--space-xs);
+      gap: 6px;
       margin-top: var(--space-xs);
+      box-sizing: border-box;
+      transition: align-self var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .jardin-actions.hand-right {
+      align-self: flex-end;
+      margin-right: 0;
+    }
+
+    .jardin-actions.hand-left {
+      align-self: flex-start;
+      margin-left: 0;
+    }
+
+    .jardin-actions.hand-center {
+      align-self: center;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .action-btn {
@@ -635,6 +654,48 @@ export function renderJardin(container: HTMLElement): () => void {
       cursor: pointer;
       text-decoration: underline;
       padding: 4px;
+    }
+
+    /* Adaptación a PC / Pantallas de escritorio */
+    @media (min-width: 601px) {
+      .jardin-nav {
+        max-width: 560px;
+      }
+
+      .stage-wrapper {
+        max-width: 560px;
+      }
+
+      .canvas-container {
+        width: 560px;
+        height: 440px;
+        border-width: 4px;
+        border-radius: var(--border-radius-frame);
+        box-shadow: var(--shadow-desktop-frame);
+      }
+
+      .frog-speech-bubble {
+        font-size: var(--font-size-md);
+        padding: 8px 18px;
+      }
+
+      .jardin-actions {
+        max-width: 480px;
+        align-self: center !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        gap: 10px;
+      }
+
+      .action-btn {
+        font-size: var(--font-size-md);
+        padding: 10px 14px;
+      }
+
+      .reminder-inapp-banner,
+      .support-card-section {
+        max-width: 560px;
+      }
     }
   `
   document.head.appendChild(style)
@@ -1178,7 +1239,7 @@ export function renderJardin(container: HTMLElement): () => void {
   const updateAcomodarUI = () => {
     gridOverlay.style.display = isAcomodarMode ? 'grid' : 'none'
     acomodarPanel.style.display = isAcomodarMode ? 'flex' : 'none'
-    actions.style.display = isAcomodarMode ? 'none' : 'flex'
+    actions.style.display = isAcomodarMode ? 'none' : 'grid'
     acomodarTopBtn.classList.toggle('active', isAcomodarMode)
     if (isAcomodarMode) {
       updateGridOverlay()
@@ -1192,7 +1253,8 @@ export function renderJardin(container: HTMLElement): () => void {
 
   // ── 4. Botones de Acción de Bienestar ──
   const actions = document.createElement('div')
-  actions.className = 'jardin-actions'
+  const currentHandMode = gardenState.handMode || 'right'
+  actions.className = `jardin-actions hand-${currentHandMode}`
 
   const pausaBtn = document.createElement('button')
   pausaBtn.className = 'action-btn'

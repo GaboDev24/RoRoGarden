@@ -89,7 +89,7 @@ body {
     flex: initial;
     width: 100%;
     max-width: var(--desktop-frame-width);
-    height: min(720px, calc(100dvh - var(--space-xl)));
+    height: min(860px, calc(100dvh - var(--space-xl)));
     border: 3px solid var(--color-tinta);
     border-radius: var(--border-radius-frame);
     box-shadow: var(--shadow-desktop-frame);

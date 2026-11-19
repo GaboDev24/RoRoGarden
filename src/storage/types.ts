@@ -62,6 +62,8 @@ export interface StorageResult<T> {
 
 export type Hemisphere = 'sur' | 'norte'
 
+export type HandMode = 'right' | 'left' | 'center'
+
 export interface PlacedDecorationRef {
   /** ID de instancia único */
   id: string
@@ -90,6 +92,8 @@ export interface GardenState {
   hemisphere: Hemisphere
   /** Si la usuaria ya respondió la pregunta del nombre (evita volver a preguntar) */
   frogNameAnswered: boolean
+  /** Modo de uso a una mano para los botones principales ('right' | 'left' | 'center') */
+  handMode?: HandMode
 
   // ── Etapa 5 ──
   /** Mostrar u ocultar el botón 'Mi semana' en el jardín */
