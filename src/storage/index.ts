@@ -65,7 +65,6 @@ export const DEFAULT_GARDEN_STATE: GardenState = {
   lastSupportNoticeDate: null,
   supportSuggestionsEnabled: true,
   dismissedInAppReminders: {},
-  handMode: 'right',
 }
 
 /**

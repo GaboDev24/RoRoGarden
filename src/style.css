@@ -89,7 +89,7 @@ body {
     flex: initial;
     width: 100%;
     max-width: var(--desktop-frame-width);
-    height: min(860px, calc(100dvh - var(--space-xl)));
+    height: min(720px, calc(100dvh - var(--space-xl)));
     border: 3px solid var(--color-tinta);
     border-radius: var(--border-radius-frame);
     box-shadow: var(--shadow-desktop-frame);
@@ -108,6 +108,13 @@ body {
     border-radius: var(--border-radius-md);
     overflow: visible;
     background-color: transparent;
+  }
+
+  /* Modo PC adaptado para el Jardín: escenario amplio, nítido y disfrutable */
+  .container.container-jardin-pc {
+    max-width: 680px;
+    height: min(840px, calc(100dvh - var(--space-md)));
+    transition: max-width var(--transition-normal), height var(--transition-normal);
   }
 }
 

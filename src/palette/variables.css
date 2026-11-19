@@ -35,7 +35,7 @@
   /* === Layout === */
   --container-max:         480px;
   --container-desktop-max: 1080px;
-  --desktop-frame-width:   640px;
+  --desktop-frame-width:   400px;
   --touch-target-min:      48px;
   --border-radius-sm:      4px;
   --border-radius-md:      8px;

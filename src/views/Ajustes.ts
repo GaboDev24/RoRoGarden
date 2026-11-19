@@ -443,88 +443,6 @@ export function renderAjustes(container: HTMLElement): () => void {
   hemiContainer.appendChild(hemiSurRow)
   hemiContainer.appendChild(hemiNorteRow)
 
-  // Selector de modo a una mano (botones del jardín)
-  const handContainer = document.createElement('div')
-  handContainer.style.cssText =
-    'display: flex; flex-direction: column; gap: 4px; margin-top: var(--space-xs);'
-  const handTitle = document.createElement('span')
-  handTitle.className = 'group-desc'
-  handTitle.style.fontWeight = 'bold'
-  handTitle.textContent = copy.ajustes.handModeLabel
-
-  const handDesc = document.createElement('p')
-  handDesc.className = 'group-desc'
-  handDesc.style.margin = '0 0 4px 0'
-  handDesc.textContent = copy.ajustes.handModeDesc
-
-  const currentHand = gardenState.handMode || 'right'
-
-  const handRightRow = document.createElement('label')
-  handRightRow.className = 'radio-option'
-  const handRightRadio = document.createElement('input')
-  handRightRadio.type = 'radio'
-  handRightRadio.name = 'handMode'
-  handRightRadio.value = 'right'
-  handRightRadio.checked = currentHand === 'right'
-  handRightRadio.style.cssText = 'accent-color: var(--color-bosque);'
-  const handRightText = document.createElement('span')
-  handRightText.className = 'group-desc'
-  handRightText.style.margin = '0'
-  handRightText.textContent = copy.ajustes.handModeRight
-  handRightRow.appendChild(handRightRadio)
-  handRightRow.appendChild(handRightText)
-
-  const handLeftRow = document.createElement('label')
-  handLeftRow.className = 'radio-option'
-  const handLeftRadio = document.createElement('input')
-  handLeftRadio.type = 'radio'
-  handLeftRadio.name = 'handMode'
-  handLeftRadio.value = 'left'
-  handLeftRadio.checked = currentHand === 'left'
-  handLeftRadio.style.cssText = 'accent-color: var(--color-bosque);'
-  const handLeftText = document.createElement('span')
-  handLeftText.className = 'group-desc'
-  handLeftText.style.margin = '0'
-  handLeftText.textContent = copy.ajustes.handModeLeft
-  handLeftRow.appendChild(handLeftRadio)
-  handLeftRow.appendChild(handLeftText)
-
-  const handCenterRow = document.createElement('label')
-  handCenterRow.className = 'radio-option'
-  const handCenterRadio = document.createElement('input')
-  handCenterRadio.type = 'radio'
-  handCenterRadio.name = 'handMode'
-  handCenterRadio.value = 'center'
-  handCenterRadio.checked = currentHand === 'center'
-  handCenterRadio.style.cssText = 'accent-color: var(--color-bosque);'
-  const handCenterText = document.createElement('span')
-  handCenterText.className = 'group-desc'
-  handCenterText.style.margin = '0'
-  handCenterText.textContent = copy.ajustes.handModeCenter
-  handCenterRow.appendChild(handCenterRadio)
-  handCenterRow.appendChild(handCenterText)
-
-  const onHandChange = (val: 'right' | 'left' | 'center') => {
-    const current = loadGardenState()
-    saveGardenState({ ...current, handMode: val })
-    showToast('Alineación de botones actualizada')
-  }
-  handRightRadio.addEventListener('change', () => {
-    if (handRightRadio.checked) onHandChange('right')
-  })
-  handLeftRadio.addEventListener('change', () => {
-    if (handLeftRadio.checked) onHandChange('left')
-  })
-  handCenterRadio.addEventListener('change', () => {
-    if (handCenterRadio.checked) onHandChange('center')
-  })
-
-  handContainer.appendChild(handTitle)
-  handContainer.appendChild(handDesc)
-  handContainer.appendChild(handRightRow)
-  handContainer.appendChild(handLeftRow)
-  handContainer.appendChild(handCenterRow)
-
   // Botón reiniciar solo jardín (con doble confirmación)
   const resetGardenTitle = document.createElement('h3')
   resetGardenTitle.className = 'group-title'
@@ -623,7 +541,6 @@ export function renderAjustes(container: HTMLElement): () => void {
   gardenGroup.appendChild(gardenTitle)
   gardenGroup.appendChild(gardenAnimRow)
   gardenGroup.appendChild(hemiContainer)
-  gardenGroup.appendChild(handContainer)
   gardenGroup.appendChild(resetGardenTitle)
   gardenGroup.appendChild(resetGardenDesc)
   gardenGroup.appendChild(resetGardenBtn)

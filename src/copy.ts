@@ -253,11 +253,6 @@ export const copy = {
     hemisphereLabel: 'Hemisferio',
     hemisphereSur: 'Sur (Argentina)',
     hemisphereNorte: 'Norte',
-    handModeLabel: 'Uso con una sola mano (botones del jardín):',
-    handModeDesc: 'Agrupa los botones principales para que llegues cómodo con el pulgar sin forzar la mano.',
-    handModeRight: 'Mano derecha (botones hacia la derecha)',
-    handModeLeft: 'Mano izquierda (botones hacia la izquierda)',
-    handModeCenter: 'Centrado (botones en el centro)',
 
     // Etapa 5
     weekTitle: 'Mi semana y recordatorios',

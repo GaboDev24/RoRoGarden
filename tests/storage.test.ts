@@ -303,25 +303,6 @@ describe('Módulo de Almacenamiento Local (RoRoGarden)', () => {
     expect(cleared.obtainedItemIds).toEqual([])
   })
 
-  it('guarda y recupera la preferencia de uso con una sola mano (handMode)', () => {
-    const initial = loadGardenState()
-    expect(['right', 'left', 'center']).toContain(initial.handMode || 'right')
-
-    saveGardenState({
-      ...initial,
-      handMode: 'left',
-    })
-
-    const updated = loadGardenState()
-    expect(updated.handMode).toBe('left')
-
-    saveGardenState({
-      ...updated,
-      handMode: 'center',
-    })
-    expect(loadGardenState().handMode).toBe('center')
-  })
-
   it('guarda registros de pausas en silencio y los incluye en exportación', () => {
     const resDesafio = savePauseEntry('desafio', {
       challengeId: 'cuerpo-cuello',

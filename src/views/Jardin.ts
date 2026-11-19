@@ -101,10 +101,34 @@ export function renderJardin(container: HTMLElement): () => void {
   // Estado del mundo (hora, estación, paleta)
   const world = getWorldState(new Date(), gardenState.hemisphere)
 
+  // Modo PC adaptado (detección de pantalla y preferencia persistida)
+  const PC_VIEW_STORAGE_KEY = 'roro_pc_view_mode'
+  const isWideScreen = typeof window !== 'undefined' && window.innerWidth >= 601
+  let isPcView = false
+  try {
+    const stored = localStorage.getItem(PC_VIEW_STORAGE_KEY)
+    if (stored !== null) {
+      isPcView = stored === 'true'
+    } else {
+      isPcView = isWideScreen
+    }
+  } catch {
+    isPcView = isWideScreen
+  }
+
   const section = document.createElement('section')
   section.className = 'jardin-screen'
+  if (isPcView) {
+    section.classList.add('jardin-pc-mode')
+    container.classList.add('container-jardin-pc')
+  }
   section.setAttribute('role', 'main')
   section.setAttribute('aria-label', copy.jardin.title)
+
+  const applyPcView = () => {
+    section.classList.toggle('jardin-pc-mode', isPcView)
+    container.classList.toggle('container-jardin-pc', isPcView)
+  }
 
   const style = document.createElement('style')
   style.textContent = `
@@ -273,6 +297,70 @@ export function renderJardin(container: HTMLElement): () => void {
       user-select: none;
     }
 
+    /* ── Adaptación para PC / Escritorio ── */
+    .jardin-screen.jardin-pc-mode {
+      padding: var(--space-sm) var(--space-lg) var(--space-md);
+    }
+
+    .jardin-screen.jardin-pc-mode .jardin-nav {
+      max-width: 600px;
+    }
+
+    .jardin-screen.jardin-pc-mode .stage-wrapper {
+      max-width: 580px;
+      margin: var(--space-xs) 0;
+    }
+
+    .jardin-screen.jardin-pc-mode .canvas-container {
+      width: min(560px, 92vw);
+      height: min(440px, calc(92vw * 110 / 140));
+      aspect-ratio: 140 / 110;
+      border-width: 4px;
+      box-shadow: 0 10px 30px rgba(43, 58, 66, 0.28);
+    }
+
+    .jardin-screen.jardin-pc-mode .jardin-actions {
+      max-width: 580px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-xs);
+    }
+
+    .jardin-screen.jardin-pc-mode .action-btn {
+      padding: var(--space-xs) var(--space-xs);
+      font-size: var(--font-size-sm);
+    }
+
+    .jardin-screen.jardin-pc-mode .frog-speech-bubble {
+      font-size: 15px;
+      padding: 8px 18px;
+      top: 32%;
+      box-shadow: 0 6px 20px rgba(43, 58, 66, 0.35);
+    }
+
+    .jardin-screen.jardin-pc-mode .acomodar-panel {
+      max-width: 580px;
+    }
+
+    .jardin-screen.jardin-pc-mode .acomodar-item-thumb {
+      width: 50px;
+      height: 50px;
+    }
+
+    .pc-keyboard-hint {
+      font-family: var(--font-ui);
+      font-size: 11px;
+      color: var(--color-tinta);
+      opacity: 0.82;
+      margin-top: 6px;
+      text-align: center;
+      display: none;
+      line-height: 1.3;
+    }
+
+    .jardin-screen.jardin-pc-mode .pc-keyboard-hint {
+      display: block;
+    }
+
     .frog-speech-bubble::after {
       content: '';
       position: absolute;
@@ -410,176 +498,12 @@ export function renderJardin(container: HTMLElement): () => void {
       transform: translateY(-2px);
     }
 
-    /* Wrapper del panel a una mano */
-    .jardin-actions-wrapper {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-top: auto;
-      z-index: 25;
-      position: relative;
-      box-sizing: border-box;
-      transition: align-items var(--transition-fast);
-    }
-
-    .jardin-actions-wrapper.hand-right {
-      align-items: flex-end;
-    }
-
-    .jardin-actions-wrapper.hand-left {
-      align-items: flex-start;
-    }
-
-    .jardin-actions-wrapper.hand-center {
-      align-items: center;
-    }
-
-    .hand-toolbar {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0 2px;
-      user-select: none;
-    }
-
-    .hand-toggle-btn {
-      font-family: var(--font-ui);
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--color-tinta);
-      background-color: var(--color-crema);
-      border: 1.5px solid var(--color-bosque);
-      border-radius: var(--border-radius-sm);
-      padding: 4px 8px;
-      min-height: 32px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: background-color var(--transition-fast), transform var(--transition-fast);
-      box-shadow: 0 1px 3px rgba(43, 58, 66, 0.15);
-    }
-
-    .hand-toggle-btn:hover {
-      background-color: var(--color-salvia);
-      transform: translateY(-1px);
-    }
-
-    .hand-toggle-btn:focus-visible {
-      outline: 2px solid var(--color-acento);
-    }
-
-    .hand-more-btn {
-      font-family: var(--font-ui);
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--color-tinta);
-      background-color: var(--color-menta);
-      border: 1.5px solid var(--color-bosque);
-      border-radius: var(--border-radius-sm);
-      padding: 4px 8px;
-      min-height: 32px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: background-color var(--transition-fast), transform var(--transition-fast);
-      box-shadow: 0 1px 3px rgba(43, 58, 66, 0.15);
-    }
-
-    .hand-more-btn:hover {
-      background-color: var(--color-crema);
-      transform: translateY(-1px);
-    }
-
-    .hand-more-btn:focus-visible {
-      outline: 2px solid var(--color-acento);
-    }
-
-    .hand-quick-menu {
-      position: absolute;
-      bottom: calc(100% + 4px);
-      background-color: var(--color-crema);
-      border: 2px solid var(--color-tinta);
-      border-radius: var(--border-radius-md);
-      box-shadow: 0 6px 20px rgba(43, 58, 66, 0.3);
-      padding: 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      width: 190px;
-      z-index: 40;
-      animation: popQuickMenu 0.16s ease-out;
-    }
-
-    .jardin-actions-wrapper.hand-right .hand-quick-menu {
-      right: 0;
-    }
-
-    .jardin-actions-wrapper.hand-left .hand-quick-menu {
-      left: 0;
-    }
-
-    .jardin-actions-wrapper.hand-center .hand-quick-menu {
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    @keyframes popQuickMenu {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .quick-menu-item {
-      font-family: var(--font-ui);
-      font-size: var(--font-size-xs);
-      font-weight: 600;
-      color: var(--color-tinta);
-      background-color: transparent;
-      border: 1px solid transparent;
-      border-radius: var(--border-radius-sm);
-      padding: 8px 10px;
-      min-height: 40px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-align: left;
-      text-decoration: none;
-      transition: background-color var(--transition-fast);
-      box-sizing: border-box;
-    }
-
-    .quick-menu-item:hover, .quick-menu-item:focus-visible {
-      background-color: var(--color-salvia);
-      border-color: var(--color-bosque);
-    }
-
     .jardin-actions {
       width: 100%;
-      max-width: 270px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      box-sizing: border-box;
-      transition: align-self var(--transition-fast), transform var(--transition-fast);
-    }
-
-    .jardin-actions.hand-right {
-      align-self: flex-end;
-      margin-right: 0;
-    }
-
-    .jardin-actions.hand-left {
-      align-self: flex-start;
-      margin-left: 0;
-    }
-
-    .jardin-actions.hand-center {
-      align-self: center;
-      margin-left: auto;
-      margin-right: auto;
+      gap: var(--space-xs);
+      margin-top: var(--space-xs);
     }
 
     .action-btn {
@@ -589,27 +513,10 @@ export function renderJardin(container: HTMLElement): () => void {
       color: var(--color-crema);
       background-color: var(--color-bosque);
       border: 2px solid var(--color-tinta);
-      border-radius: 12px;
-      padding: 8px 6px;
-      min-height: 52px;
+      border-radius: var(--border-radius-md);
+      padding: var(--space-xs) var(--space-xs);
+      min-height: var(--touch-target-min);
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      text-align: center;
-      line-height: 1.25;
-      white-space: normal;
-      overflow-wrap: break-word;
-      word-break: break-word;
-      box-sizing: border-box;
-      box-shadow: 0 2px 5px rgba(43, 58, 66, 0.18);
-      transition: transform var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
-    }
-
-    .action-btn:active {
-      transform: scale(0.96);
-    }
       display: flex;
       align-items: center;
       justify-content: center;
@@ -817,56 +724,6 @@ export function renderJardin(container: HTMLElement): () => void {
       text-decoration: underline;
       padding: 4px;
     }
-
-    /* Adaptación a PC / Pantallas de escritorio */
-    @media (min-width: 601px) {
-      .hand-toolbar {
-        display: none !important;
-      }
-
-      .jardin-actions-wrapper {
-        align-items: center !important;
-      }
-
-      .jardin-nav {
-        max-width: 560px;
-      }
-
-      .stage-wrapper {
-        max-width: 560px;
-      }
-
-      .canvas-container {
-        width: 560px;
-        height: 440px;
-        border-width: 4px;
-        border-radius: var(--border-radius-frame);
-        box-shadow: var(--shadow-desktop-frame);
-      }
-
-      .frog-speech-bubble {
-        font-size: var(--font-size-md);
-        padding: 8px 18px;
-      }
-
-      .jardin-actions {
-        max-width: 480px;
-        align-self: center !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-        gap: 10px;
-      }
-
-      .action-btn {
-        font-size: var(--font-size-md);
-        padding: 10px 14px;
-      }
-
-      .reminder-inapp-banner,
-      .support-card-section {
-        max-width: 560px;
-      }
-    }
   `
   document.head.appendChild(style)
 
@@ -925,6 +782,29 @@ export function renderJardin(container: HTMLElement): () => void {
     })
     nav.appendChild(semanaBtn)
   }
+
+  // Botón para alternar vista amplia de PC vs compacta
+  const pcToggleBtn = document.createElement('button')
+  pcToggleBtn.className = 'nav-btn nav-btn-icon'
+  const updatePcToggleBtn = () => {
+    pcToggleBtn.innerHTML = ''
+    pcToggleBtn.appendChild(createFaIcon(isPcView ? 'mobile' : 'desktop', { size: 14 }))
+    const tip = isPcView ? 'Cambiar a vista compacta de celular' : 'Cambiar a vista amplia de PC'
+    pcToggleBtn.title = tip
+    pcToggleBtn.setAttribute('aria-label', tip)
+  }
+  updatePcToggleBtn()
+  pcToggleBtn.addEventListener('click', () => {
+    isPcView = !isPcView
+    try {
+      localStorage.setItem(PC_VIEW_STORAGE_KEY, isPcView ? 'true' : 'false')
+    } catch {
+      // Ignorado
+    }
+    applyPcView()
+    updatePcToggleBtn()
+  })
+  nav.appendChild(pcToggleBtn)
 
   nav.appendChild(settingsBtn)
 
@@ -1037,6 +917,35 @@ export function renderJardin(container: HTMLElement): () => void {
     if (Math.hypot(canvasClickX - frogCenterX, canvasClickY - frogCenterY) < 55) {
       triggerFrogTap()
     }
+  })
+
+  // En PC: cursor dinámico y tooltip interactivo sobre el sapo
+  canvasContainer.addEventListener('mousemove', (e) => {
+    if (isAcomodarMode) return
+    const rect = canvasContainer.getBoundingClientRect()
+    const clickX = e.clientX - rect.left
+    const clickY = e.clientY - rect.top
+    const scaleX = (SCENE_W * 2) / rect.width
+    const scaleY = (SCENE_H * 2) / rect.height
+    const canvasClickX = clickX * scaleX
+    const canvasClickY = clickY * scaleY
+
+    const frogCenterX = 136
+    const frogCenterY = 124
+    if (Math.hypot(canvasClickX - frogCenterX, canvasClickY - frogCenterY) < 55) {
+      canvasContainer.style.cursor = 'pointer'
+      canvasContainer.title = gardenState.frogName
+        ? `Tu sapo ${gardenState.frogName} (clic o barra espaciadora)`
+        : 'Tu sapo (clic o barra espaciadora)'
+    } else {
+      canvasContainer.style.cursor = 'default'
+      canvasContainer.title = ''
+    }
+  })
+
+  canvasContainer.addEventListener('mouseleave', () => {
+    canvasContainer.style.cursor = 'default'
+    canvasContainer.title = ''
   })
 
   // Instancias de sprites
@@ -1409,7 +1318,7 @@ export function renderJardin(container: HTMLElement): () => void {
   const updateAcomodarUI = () => {
     gridOverlay.style.display = isAcomodarMode ? 'grid' : 'none'
     acomodarPanel.style.display = isAcomodarMode ? 'flex' : 'none'
-    actionsWrapper.style.display = isAcomodarMode ? 'none' : 'flex'
+    actions.style.display = isAcomodarMode ? 'none' : 'flex'
     acomodarTopBtn.classList.toggle('active', isAcomodarMode)
     if (isAcomodarMode) {
       updateGridOverlay()
@@ -1421,126 +1330,9 @@ export function renderJardin(container: HTMLElement): () => void {
   stageWrapper.appendChild(canvasContainer)
   stageWrapper.appendChild(acomodarPanel)
 
-  // ── 4. Botones de Acción de Bienestar y Barra a Una Mano ──
-  const actionsWrapper = document.createElement('div')
-  let currentHandMode = gardenState.handMode || 'right'
-  actionsWrapper.className = `jardin-actions-wrapper hand-${currentHandMode}`
-
-  // Barra de herramientas a una mano (Toggle rápido de mano y Menú rápido de pulgar)
-  const handToolbar = document.createElement('div')
-  handToolbar.className = 'hand-toolbar'
-
-  const handToggleBtn = document.createElement('button')
-  handToggleBtn.type = 'button'
-  handToggleBtn.className = 'hand-toggle-btn'
-  handToggleBtn.title = 'Alternar lado para manejar con una sola mano'
-
-  const updateHandToggleLabel = () => {
-    handToggleBtn.innerHTML = ''
-    handToggleBtn.appendChild(createFaIcon('rotate', { size: 11 }))
-    const label =
-      currentHandMode === 'right'
-        ? '✋ Mano der.'
-        : currentHandMode === 'left'
-        ? '✋ Mano izq.'
-        : '✋ Centro'
-    handToggleBtn.appendChild(document.createTextNode(label))
-  }
-  updateHandToggleLabel()
-
-  handToggleBtn.addEventListener('click', () => {
-    if (currentHandMode === 'right') {
-      currentHandMode = 'left'
-    } else if (currentHandMode === 'left') {
-      currentHandMode = 'center'
-    } else {
-      currentHandMode = 'right'
-    }
-    gardenState = { ...gardenState, handMode: currentHandMode }
-    saveGardenState(gardenState)
-
-    actionsWrapper.className = `jardin-actions-wrapper hand-${currentHandMode}`
-    actions.className = `jardin-actions hand-${currentHandMode}`
-    updateHandToggleLabel()
-  })
-
-  // Botón "Más opciones" (despliega menú rápido de pulgar para no tener que alcanzar arriba)
-  const handMoreBtn = document.createElement('button')
-  handMoreBtn.type = 'button'
-  handMoreBtn.className = 'hand-more-btn'
-  handMoreBtn.appendChild(createFaIcon('gear', { size: 11 }))
-  handMoreBtn.appendChild(document.createTextNode('Más ▾'))
-
-  let quickMenu: HTMLElement | null = null
-
-  const closeQuickMenu = () => {
-    if (quickMenu) {
-      quickMenu.remove()
-      quickMenu = null
-    }
-  }
-
-  handMoreBtn.addEventListener('click', (e) => {
-    e.stopPropagation()
-    if (quickMenu) {
-      closeQuickMenu()
-      return
-    }
-
-    quickMenu = document.createElement('div')
-    quickMenu.className = 'hand-quick-menu'
-
-    const itemColeccion = document.createElement('a')
-    itemColeccion.className = 'quick-menu-item'
-    itemColeccion.href = '#/micoleccion'
-    itemColeccion.appendChild(createFaIcon('heart', { size: 12 }))
-    itemColeccion.appendChild(document.createTextNode('Mi colección'))
-
-    const itemAcomodar = document.createElement('button')
-    itemAcomodar.type = 'button'
-    itemAcomodar.className = 'quick-menu-item'
-    itemAcomodar.appendChild(createFaIcon('rotate', { size: 12 }))
-    itemAcomodar.appendChild(document.createTextNode('Acomodar jardín'))
-    itemAcomodar.addEventListener('click', () => {
-      closeQuickMenu()
-      isAcomodarMode = true
-      updateAcomodarUI()
-    })
-
-    const itemSemana = document.createElement('a')
-    itemSemana.className = 'quick-menu-item'
-    itemSemana.href = '#/semana'
-    itemSemana.appendChild(createFaIcon('bookOpen', { size: 12 }))
-    itemSemana.appendChild(document.createTextNode('Mi semana'))
-
-    const itemAjustes = document.createElement('a')
-    itemAjustes.className = 'quick-menu-item'
-    itemAjustes.href = '#/ajustes'
-    itemAjustes.appendChild(createFaIcon('gear', { size: 12 }))
-    itemAjustes.appendChild(document.createTextNode('Ajustes'))
-
-    quickMenu.appendChild(itemColeccion)
-    quickMenu.appendChild(itemAcomodar)
-    quickMenu.appendChild(itemSemana)
-    quickMenu.appendChild(itemAjustes)
-
-    actionsWrapper.appendChild(quickMenu)
-  })
-
-  // Cerrar quickMenu al hacer click afuera
-  const onDocClick = (e: MouseEvent) => {
-    if (quickMenu && !quickMenu.contains(e.target as Node) && e.target !== handMoreBtn) {
-      closeQuickMenu()
-    }
-  }
-  document.addEventListener('click', onDocClick)
-
-  handToolbar.appendChild(handToggleBtn)
-  handToolbar.appendChild(handMoreBtn)
-
-  // Grilla de las 4 acciones principales de bienestar
+  // ── 4. Botones de Acción de Bienestar ──
   const actions = document.createElement('div')
-  actions.className = `jardin-actions hand-${currentHandMode}`
+  actions.className = 'jardin-actions'
 
   const pausaBtn = document.createElement('button')
   pausaBtn.className = 'action-btn'
@@ -1578,9 +1370,6 @@ export function renderJardin(container: HTMLElement): () => void {
   actions.appendChild(checkinBtn)
   actions.appendChild(diarioBtn)
   actions.appendChild(historialBtn)
-
-  actionsWrapper.appendChild(handToolbar)
-  actionsWrapper.appendChild(actions)
 
   // ── 4.5. Banner In-App de Recordatorio (si coincide horario y no está descartado hoy) ──
   const activeReminder = checkInAppReminder(
@@ -1698,14 +1487,52 @@ export function renderJardin(container: HTMLElement): () => void {
     supportCard.appendChild(sNeverBtn)
   }
 
+  // Pista de teclado para PC
+  const pcHint = document.createElement('p')
+  pcHint.className = 'pc-keyboard-hint'
+  pcHint.textContent = '💡 En PC: Espacio para interactuar con tu sapo · Tecla A para acomodar · Esc para salir'
+
   // Ensamblar pantalla
   section.appendChild(nav)
   section.appendChild(header)
   if (reminderBanner) section.appendChild(reminderBanner)
   section.appendChild(stageWrapper)
   if (supportCard) section.appendChild(supportCard)
-  section.appendChild(actionsWrapper)
+  section.appendChild(actions)
+  section.appendChild(pcHint)
   container.appendChild(section)
+
+  // Atajos de teclado en PC
+  const onKeyDown = (e: KeyboardEvent) => {
+    const target = e.target as HTMLElement | null
+    const isInputActive =
+      target &&
+      (target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable)
+    if (isInputActive) return
+
+    if (e.code === 'Space') {
+      if (!isAcomodarMode) {
+        e.preventDefault()
+        triggerFrogTap()
+      }
+    } else if (e.key === 'a' || e.key === 'A') {
+      isAcomodarMode = !isAcomodarMode
+      updateAcomodarUI()
+    } else if (e.key === 'Escape') {
+      if (speechEl) {
+        if (speechTimer) clearTimeout(speechTimer)
+        speechEl.remove()
+        speechEl = null
+      }
+      if (isAcomodarMode) {
+        isAcomodarMode = false
+        updateAcomodarUI()
+      }
+    }
+  }
+  window.addEventListener('keydown', onKeyDown)
 
   if (isAcomodarMode) {
     updateAcomodarUI()
@@ -1835,9 +1662,9 @@ export function renderJardin(container: HTMLElement): () => void {
   return () => {
     if (animFrameId) cancelAnimationFrame(animFrameId)
     document.removeEventListener('visibilitychange', onVisibilityChange)
-    document.removeEventListener('click', onDocClick)
-    if (quickMenu) quickMenu.remove()
+    window.removeEventListener('keydown', onKeyDown)
     if (frogHopTimer) clearTimeout(frogHopTimer)
+    container.classList.remove('container-jardin-pc')
     style.remove()
   }
 }
