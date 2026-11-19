@@ -19,10 +19,11 @@ describe('Lógica de colocación y decoración (placement)', () => {
 
   it('valida límites de la grilla correctamente', () => {
     expect(isWithinGrid(0, 0, 1, 1)).toBe(true)
+    expect(isWithinGrid(6, 4, 1, 1)).toBe(true)   // esquina derecha-abajo válida (7 cols × 5 rows)
     expect(isWithinGrid(4, 4, 1, 1)).toBe(true)
     expect(isWithinGrid(-1, 0, 1, 1)).toBe(false)
     expect(isWithinGrid(0, 5, 1, 1)).toBe(false)
-    expect(isWithinGrid(5, 0, 1, 1)).toBe(false)
+    expect(isWithinGrid(7, 0, 1, 1)).toBe(false)   // fuera por columna (7 cols: max index=6)
   })
 
   it('respeta el tipo de terreno (cielo, tierra, agua, ambos)', () => {

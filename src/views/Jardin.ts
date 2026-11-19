@@ -293,7 +293,7 @@ export function renderJardin(container: HTMLElement): () => void {
       z-index: 30;
       white-space: nowrap;
       text-align: center;
-      animation: floatSpeech 4s ease-out forwards;
+      animation: floatSpeech 6s ease-out forwards;
       user-select: none;
     }
 
@@ -392,7 +392,7 @@ export function renderJardin(container: HTMLElement): () => void {
       position: absolute;
       inset: 0;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(7, 1fr);
       grid-template-rows: repeat(5, 1fr);
       gap: 0;
       padding: 0;
@@ -874,16 +874,19 @@ export function renderJardin(container: HTMLElement): () => void {
       speechEl = null
     }
 
-    // Mostrar frase corta y mantenerla 4 segundos completos
+    // Mostrar frase corta y mantenerla 6 segundos completos
     const phrase = copy.jardin.frogTap[Math.floor(Math.random() * copy.jardin.frogTap.length)]
     speechEl = document.createElement('div')
     speechEl.className = 'frog-speech-bubble'
     speechEl.textContent = phrase
     speechEl.title = 'Tocá para cerrar'
+    const speechCreatedAt = Date.now()
 
     // Permitir cerrarlo tocando el cartel
+    // Guarda de 600ms: evita que el click sintético (mobile) cierre la burbuja al instante
     speechEl.addEventListener('click', (e) => {
       e.stopPropagation()
+      if (Date.now() - speechCreatedAt < 600) return
       if (speechTimer) {
         clearTimeout(speechTimer)
         speechTimer = null
@@ -898,7 +901,7 @@ export function renderJardin(container: HTMLElement): () => void {
       speechEl?.remove()
       speechEl = null
       speechTimer = null
-    }, 4000)
+    }, 6000)
   }
 
   canvasContainer.addEventListener('click', (e) => {
@@ -1038,6 +1041,22 @@ export function renderJardin(container: HTMLElement): () => void {
     ctx.fillRect(58, 66, 2, 2)
     ctx.fillRect(138, 58, 2, 2)
     ctx.fillRect(212, 70, 2, 2)
+    // Piedras pequeñas en el fondo
+    ctx.fillStyle = palette.azulNiebla
+    ctx.fillRect(42, 74, 6, 3)
+    ctx.fillRect(44, 72, 4, 2)
+    ctx.fillRect(160, 70, 8, 4)
+    ctx.fillRect(162, 68, 5, 2)
+    // Hongitos de fondo sutiles
+    ctx.fillStyle = palette.musgo
+    ctx.fillRect(72, 76, 4, 6)
+    ctx.fillRect(70, 76, 8, 3)
+    ctx.fillStyle = palette.crema
+    ctx.fillRect(72, 74, 4, 2)
+    ctx.fillRect(192, 72, 4, 6)
+    ctx.fillRect(190, 72, 8, 3)
+    ctx.fillStyle = palette.acento
+    ctx.fillRect(192, 70, 4, 2)
 
     // 3. Estanque de agua (filas 2 y 3)
     // Borde exterior ribereño
@@ -1067,6 +1086,9 @@ export function renderJardin(container: HTMLElement): () => void {
     ctx.fillStyle = palette.celesteAgua
     ctx.fillRect(90 + Math.cos(waveT) * 3, 114, 16, 1)
     ctx.fillRect(150 + Math.cos(waveT + 2) * 3, 162, 20, 1)
+    // Ondas extra para más vida
+    ctx.fillRect(110 + Math.sin(waveT + 0.5) * 3, 134, 12, 1)
+    ctx.fillRect(220 + Math.cos(waveT + 1.5) * 3, 142, 14, 1)
 
     // Onda concéntrica tenue bajo el nenúfar
     ctx.strokeStyle = palette.turquesa
@@ -1074,6 +1096,19 @@ export function renderJardin(container: HTMLElement): () => void {
     ctx.beginPath()
     ctx.ellipse(SCENE_W, 152, 38 + Math.sin(waveT * 1.5) * 2, 10, 0, 0, Math.PI * 2)
     ctx.stroke()
+
+    // Juncos a los costados del estanque (animados suavemente)
+    ctx.fillStyle = palette.bosque
+    const junkSwayL = Math.sin(waveT * 0.8) * 1
+    ctx.fillRect(32 + junkSwayL, 108, 2, 22) // junco izq A
+    ctx.fillRect(44 + junkSwayL, 112, 2, 18) // junco izq B
+    ctx.fillRect(238 - junkSwayL, 110, 2, 20) // junco der A
+    ctx.fillRect(252 - junkSwayL, 106, 2, 24) // junco der B
+    ctx.fillStyle = palette.salvia
+    ctx.fillRect(30 + junkSwayL, 106, 6, 4) // cabecita junco izq A
+    ctx.fillRect(42 + junkSwayL, 110, 6, 4) // cabecita junco izq B
+    ctx.fillRect(236 - junkSwayL, 108, 6, 4) // cabecita junco der A
+    ctx.fillRect(250 - junkSwayL, 104, 6, 4) // cabecita junco der B
 
     // 4. Banda de tierra baja / primer plano (fila 4)
     ctx.fillStyle = world.foliageColor
@@ -1089,6 +1124,18 @@ export function renderJardin(container: HTMLElement): () => void {
     for (let gx = 0; gx < SCENE_W * 2; gx += 12) {
       ctx.fillRect(gx + 1, 183, 2, 3)
     }
+    // Flores pequeñas en la tierra baja
+    ctx.fillStyle = palette.acento
+    ctx.fillRect(30, 196, 2, 2)
+    ctx.fillRect(84, 200, 2, 2)
+    ctx.fillRect(140, 192, 2, 2)
+    ctx.fillRect(216, 198, 2, 2)
+    ctx.fillRect(262, 193, 2, 2)
+    ctx.fillStyle = palette.crema
+    ctx.fillRect(56, 194, 2, 2)
+    ctx.fillRect(118, 202, 2, 2)
+    ctx.fillRect(188, 190, 2, 2)
+    ctx.fillRect(238, 200, 2, 2)
 
     // Piedritas lisas en los rincones
     ctx.fillStyle = palette.azulNiebla
@@ -1096,9 +1143,13 @@ export function renderJardin(container: HTMLElement): () => void {
     ctx.fillRect(18, 202, 4, 2)
     ctx.fillRect(256, 206, 7, 4)
     ctx.fillRect(258, 204, 4, 2)
+    // Piedra adicional en el centro-derecha
+    ctx.fillRect(102, 208, 5, 3)
+    ctx.fillRect(104, 206, 3, 2)
     ctx.fillStyle = palette.tinta
     ctx.fillRect(16, 208, 6, 1)
     ctx.fillRect(256, 210, 7, 1)
+    ctx.fillRect(102, 211, 5, 1)
 
     // 5. Dibujar decoraciones colocadas en la grilla
     const CELL_W = (SCENE_W * 2) / GARDEN_GRID_COLS // 56px
@@ -1114,8 +1165,8 @@ export function renderJardin(container: HTMLElement): () => void {
       }
     }
 
-    // 6. Nenúfar y Sapo Protagonista (en el centro: x=2, y=3)
-    const padX = Math.round(2 * CELL_W + (CELL_W - 56) / 2)
+    // 6. Nenúfar y Sapo Protagonista (en el centro: x=3, y=3)
+    const padX = Math.round(3 * CELL_W + (CELL_W - 56) / 2)
     const padY = Math.round(3 * CELL_H + (CELL_H - 24) / 2)
     drawSprite(ctx, instPad, padX, padY, 2)
 
@@ -1177,8 +1228,8 @@ export function renderJardin(container: HTMLElement): () => void {
         const terrain = getCellTerrain(c, r)
         cellBtn.title = `Fila ${r + 1}, Columna ${c + 1} (${terrain})`
 
-        // Celda central reservada para el sapo y nenúfar
-        if (c === 2 && r === 3) {
+        // Celda central reservada para el sapo y nenúfar (col=3 en grilla 7×5)
+        if (c === 3 && r === 3) {
           cellBtn.classList.add('center-frog')
           cellBtn.disabled = true
           cellBtn.title = 'Lugar del sapo'

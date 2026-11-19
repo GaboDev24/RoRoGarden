@@ -9,7 +9,7 @@
 
 import type { CatalogItem, TerrainType } from './catalog'
 
-export const GARDEN_GRID_COLS = 5
+export const GARDEN_GRID_COLS = 7
 export const GARDEN_GRID_ROWS = 5
 
 export interface PlacedDecoration {
