@@ -83,4 +83,49 @@ describe('Vista Jardin — Adaptación PC y Ergonomía a una mano', () => {
 
     cleanup()
   })
+
+  it('permite alternar de mano al instante con el botón toggle del panel', () => {
+    const cleanup = renderJardin(container)
+
+    const toggleBtn = container.querySelector('.hand-toggle-btn') as HTMLButtonElement
+    expect(toggleBtn).not.toBeNull()
+    expect(toggleBtn.textContent).toContain('Mano der.')
+
+    // Click para alternar a mano izquierda
+    toggleBtn.click()
+    expect(toggleBtn.textContent).toContain('Mano izq.')
+    expect(container.querySelector('.jardin-actions')?.classList.contains('hand-left')).toBe(true)
+
+    // Click para alternar a centrado
+    toggleBtn.click()
+    expect(toggleBtn.textContent).toContain('Centro')
+    expect(container.querySelector('.jardin-actions')?.classList.contains('hand-center')).toBe(true)
+
+    cleanup()
+  })
+
+  it('despliega el menú rápido al pulsar el botón Más del dock de pulgar', () => {
+    const cleanup = renderJardin(container)
+
+    const moreBtn = container.querySelector('.hand-more-btn') as HTMLButtonElement
+    expect(moreBtn).not.toBeNull()
+
+    // Inicialmente no está abierto
+    expect(container.querySelector('.hand-quick-menu')).toBeNull()
+
+    // Abrir menú rápido
+    moreBtn.click()
+    const menu = container.querySelector('.hand-quick-menu')
+    expect(menu).not.toBeNull()
+    expect(menu?.textContent).toContain('Mi colección')
+    expect(menu?.textContent).toContain('Acomodar jardín')
+    expect(menu?.textContent).toContain('Mi semana')
+    expect(menu?.textContent).toContain('Ajustes')
+
+    // Click afuera lo cierra
+    document.body.click()
+    expect(container.querySelector('.hand-quick-menu')).toBeNull()
+
+    cleanup()
+  })
 })
