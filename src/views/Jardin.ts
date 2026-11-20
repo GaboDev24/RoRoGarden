@@ -299,30 +299,50 @@ export function renderJardin(container: HTMLElement): () => void {
 
     /* ── Adaptación para PC / Escritorio ── */
     .jardin-screen.jardin-pc-mode {
-      padding: var(--space-sm) var(--space-lg) var(--space-md);
+      padding: var(--space-sm) var(--space-lg) var(--space-sm);
+      overflow: hidden;
     }
 
     .jardin-screen.jardin-pc-mode .jardin-nav {
-      max-width: 600px;
+      max-width: 620px;
+      flex-shrink: 0;
     }
 
     .jardin-screen.jardin-pc-mode .stage-wrapper {
-      max-width: 580px;
+      flex: 1 1 auto;
+      max-width: 620px;
+      width: 100%;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       margin: var(--space-xs) 0;
     }
 
     .jardin-screen.jardin-pc-mode .canvas-container {
-      width: min(560px, 92vw);
-      height: min(440px, calc(92vw * 110 / 140));
+      /* Crece para llenar el espacio disponible manteniendo proporción 140:110 */
+      width: 100%;
+      max-width: 620px;
+      height: auto;
       aspect-ratio: 140 / 110;
+      max-height: calc(100% - 4px);
       border-width: 4px;
       box-shadow: 0 10px 30px rgba(43, 58, 66, 0.28);
     }
 
     .jardin-screen.jardin-pc-mode .jardin-actions {
-      max-width: 580px;
+      max-width: 620px;
+      width: 100%;
       grid-template-columns: repeat(4, 1fr);
       gap: var(--space-xs);
+      flex-shrink: 0;
+      margin-top: var(--space-xs);
+    }
+
+    .jardin-screen.jardin-pc-mode .jardin-header {
+      flex-shrink: 0;
+      margin: 2px 0;
     }
 
     .jardin-screen.jardin-pc-mode .action-btn {
@@ -392,8 +412,8 @@ export function renderJardin(container: HTMLElement): () => void {
       position: absolute;
       inset: 0;
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      grid-template-rows: repeat(5, 1fr);
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(6, 1fr);
       gap: 0;
       padding: 0;
       box-sizing: border-box;
@@ -1152,8 +1172,8 @@ export function renderJardin(container: HTMLElement): () => void {
     ctx.fillRect(102, 211, 5, 1)
 
     // 5. Dibujar decoraciones colocadas en la grilla
-    const CELL_W = (SCENE_W * 2) / GARDEN_GRID_COLS // 56px
-    const CELL_H = (SCENE_H * 2) / GARDEN_GRID_ROWS // 44px
+    const CELL_W = (SCENE_W * 2) / GARDEN_GRID_COLS // 56px con 5 cols
+    const CELL_H = (SCENE_H * 2) / GARDEN_GRID_ROWS // ≈36.67px con 6 filas
 
     for (const dec of gardenState.placedDecorations) {
       const inst = decorationInstances.get(dec.id)
@@ -1165,9 +1185,9 @@ export function renderJardin(container: HTMLElement): () => void {
       }
     }
 
-    // 6. Nenúfar y Sapo Protagonista (en el centro: x=3, y=3)
-    const padX = Math.round(3 * CELL_W + (CELL_W - 56) / 2)
-    const padY = Math.round(3 * CELL_H + (CELL_H - 24) / 2)
+    // 6. Nenúfar y Sapo Protagonista (en el centro: x=2, y=4)
+    const padX = Math.round(2 * CELL_W + (CELL_W - 56) / 2)
+    const padY = Math.round(4 * CELL_H + (CELL_H - 24) / 2)
     drawSprite(ctx, instPad, padX, padY, 2)
 
     if (canAnimate) {
@@ -1228,8 +1248,8 @@ export function renderJardin(container: HTMLElement): () => void {
         const terrain = getCellTerrain(c, r)
         cellBtn.title = `Fila ${r + 1}, Columna ${c + 1} (${terrain})`
 
-        // Celda central reservada para el sapo y nenúfar (col=3 en grilla 7×5)
-        if (c === 3 && r === 3) {
+        // Celda central reservada para el sapo y nenúfar (col=2, fila=4 en grilla 5×6)
+        if (c === 2 && r === 4) {
           cellBtn.classList.add('center-frog')
           cellBtn.disabled = true
           cellBtn.title = 'Lugar del sapo'

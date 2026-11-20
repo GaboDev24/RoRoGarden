@@ -19,11 +19,11 @@ describe('Lógica de colocación y decoración (placement)', () => {
 
   it('valida límites de la grilla correctamente', () => {
     expect(isWithinGrid(0, 0, 1, 1)).toBe(true)
-    expect(isWithinGrid(6, 4, 1, 1)).toBe(true)   // esquina derecha-abajo válida (7 cols × 5 rows)
+    expect(isWithinGrid(4, 5, 1, 1)).toBe(true)   // esquina derecha-abajo válida (5 cols × 6 rows)
     expect(isWithinGrid(4, 4, 1, 1)).toBe(true)
     expect(isWithinGrid(-1, 0, 1, 1)).toBe(false)
-    expect(isWithinGrid(0, 5, 1, 1)).toBe(false)
-    expect(isWithinGrid(7, 0, 1, 1)).toBe(false)   // fuera por columna (7 cols: max index=6)
+    expect(isWithinGrid(0, 6, 1, 1)).toBe(false)   // fuera por fila (6 rows: max index=5)
+    expect(isWithinGrid(5, 0, 1, 1)).toBe(false)   // fuera por columna (5 cols: max index=4)
   })
 
   it('respeta el tipo de terreno (cielo, tierra, agua, ambos)', () => {
@@ -31,15 +31,17 @@ describe('Lógica de colocación y decoración (placement)', () => {
     expect(getCellTerrain(2, 1)).toBe('tierra')
     expect(getCellTerrain(2, 2)).toBe('agua')
     expect(getCellTerrain(2, 3)).toBe('agua')
-    expect(getCellTerrain(2, 4)).toBe('tierra')
+    expect(getCellTerrain(2, 4)).toBe('agua')   // fila 4 es agua en grilla 5×6
+    expect(getCellTerrain(2, 5)).toBe('tierra') // fila 5 es tierra baja en grilla 5×6
 
-    // Hongo solo en tierra (filas 1 o 4)
+    // Hongo solo en tierra (filas 1 o 5)
     expect(canPlaceItem([], itemHongo, 1, 1)).toBe(true)
     expect(canPlaceItem([], itemHongo, 1, 2)).toBe(false) // agua rechazada
     expect(canPlaceItem([], itemHongo, 1, 0)).toBe(false) // cielo rechazado
 
-    // Nenúfar solo en agua (filas 2 o 3)
+    // Nenúfar solo en agua (filas 2, 3 o 4)
     expect(canPlaceItem([], itemNenufar, 2, 2)).toBe(true)
+    expect(canPlaceItem([], itemNenufar, 2, 4)).toBe(true)
     expect(canPlaceItem([], itemNenufar, 2, 1)).toBe(false) // tierra rechazada
 
     // Estrella solo en cielo (fila 0)

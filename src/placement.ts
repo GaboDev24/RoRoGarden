@@ -9,8 +9,8 @@
 
 import type { CatalogItem, TerrainType } from './catalog'
 
-export const GARDEN_GRID_COLS = 7
-export const GARDEN_GRID_ROWS = 5
+export const GARDEN_GRID_COLS = 5
+export const GARDEN_GRID_ROWS = 6
 
 export interface PlacedDecoration {
   /** Identificador único de la instancia colocada */
@@ -29,11 +29,12 @@ export interface PlacedDecoration {
  * - Fila 1: Tierra alta / fondo de vegetación
  * - Fila 2: Agua (estanque superior)
  * - Fila 3: Agua (estanque inferior)
- * - Fila 4: Tierra baja / primer plano con musgo
+ * - Fila 4: Agua baja / nenúfar
+ * - Fila 5: Tierra baja / primer plano con musgo
  */
 export function getCellTerrain(_x: number, y: number): TerrainType {
   if (y === 0) return 'cielo'
-  if (y === 1 || y === 4) return 'tierra'
+  if (y === 1 || y === 5) return 'tierra'
   return 'agua'
 }
 
