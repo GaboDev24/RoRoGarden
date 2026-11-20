@@ -862,6 +862,10 @@ export function renderJardin(container: HTMLElement): () => void {
   const SCENE_H = 110
   const { canvas, ctx } = createPixelCanvas(SCENE_W * 2, SCENE_H * 2)
   canvas.className = 'stage-canvas'
+  // Eliminar los estilos inline de tamaño fijo que impone createPixelCanvas
+  // para que el CSS (width:100%; height:100%) pueda escalar el canvas libremente.
+  canvas.style.width = ''
+  canvas.style.height = ''
   canvasContainer.appendChild(canvas)
 
   // Mensaje flotante al tocar al sapo
